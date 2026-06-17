@@ -1,0 +1,28 @@
+GUÍA PARA LA EMISIÓN DE PÓLIZAS EN SEGUROS MONTERREY NEW YORK LIFE (SMNYL)
+
+1. PROCESO DE INGRESO DE SOLICITUD
+Para emitir una póliza nueva, el asesor debe seguir los siguientes pasos:
+- **Paso 1: Cotización:** Cotizar el producto en el portal oficial "Portal de Asesores SMNYL" o mediante la herramienta "Cotizador Móvil".
+- **Paso 2: Llenado de Solicitud:** Completar la solicitud digital o física. Asegurarse de que todas las firmas sean idénticas a la identificación oficial del cliente (INE o Pasaporte vigente).
+- **Paso 3: Recopilación de Documentos Requeridos:**
+  * Identificación oficial vigente (INE o Pasaporte).
+  * Comprobante de domicilio no mayor a 3 meses (luz, agua, teléfono fijo).
+  * RFC o Cédula de Identificación Fiscal (indispensable para facturación).
+  * Cuestionario Médico (en caso de antecedentes de salud o sumas aseguradas altas).
+  * Formato de Identificación del Cliente (PLD - Prevención de Lavado de Dinero).
+
+2. ESTADOS DE UNA EMISIÓN
+En el sistema de Promotoría/SMNYL, la solicitud pasará por los siguientes estados:
+- **Pendiente / En Espera:** Documentación en revisión por la promotoría.
+- **En Suscripción:** El área médica o financiera de SMNYL está evaluando el riesgo.
+- **Requisitos Pendientes:** Falta algún documento, aclaración médica o firma. Se notifica al asesor de inmediato.
+- **Emitida:** La póliza ha sido creada. Se genera el PDF y se envía al correo del cliente y asesor.
+
+3. TIEMPOS DE RESPUESTA (SLA)
+- Productos de Vida Tradicionales (SeguBeca, Realiza, etc.): 3 a 5 días hábiles si no hay requisitos adicionales.
+- Productos de Gastos Médicos Mayores (Alfa Médica): 5 a 7 días hábiles (debido a la revisión del cuestionario médico).
+
+4. CONSEJOS IMPORTANTES PARA EVITAR REQUISITOS (DEVOLUCIONES)
+- Las firmas digitales deben realizarse a través de la herramienta autorizada (Signaturit).
+- Si el cliente es extranjero, se requiere FM2 o FM3 vigente y pasaporte de su país de origen.
+- Toda corrección en la solicitud física debe ser inicialada por el solicitante; no se permiten tachaduras ni corrector líquido.

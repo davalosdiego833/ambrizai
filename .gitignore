@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules/
+/client/node_modules/
+/server/node_modules/
+
+# Build outputs
+/client/dist/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+/server/.env
+
+# Local database files
+/server/data/chats.json
+/server/data/folders.json
+/server/data/users.json
+/server/data/knowledge_validation_report.json
+/server/backups/
+/server/test_stream.js
+/server/find_phrase_temp.js
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log

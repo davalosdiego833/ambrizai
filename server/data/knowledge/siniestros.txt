@@ -1,0 +1,31 @@
+PROTOCOLO DE ATENCIÓN Y REPORTES DE SINIESTROS PARA ASESORES
+
+1. ACCIÓN INMEDIATA ANTE UN SINIESTRO
+Cuando un asegurado sufra un siniestro (accidente, enfermedad, fallecimiento), el asesor debe actuar de la siguiente manera:
+
+A) GASTOS MÉDICOS MAYORES (GMM) - Urgencia o Accidente:
+- **Paso 1:** Recomendar al cliente acudir a un hospital de la red de SMNYL correspondiente a su plan (Básico, Integral, o Ejecutivo).
+- **Paso 2:** Presentar la credencial digital de SMNYL y su INE en la admisión del hospital.
+- **Paso 3:** Si la estancia hospitalaria supera las 24 horas, solicitar el "Reporte Médico" al médico tratante para tramitar el **Pago Directo** y evitar que el cliente pague de su bolsillo.
+- **Paso 4:** Enviar a la promotoría el número de reporte médico para seguimiento con el enlace hospitalario.
+
+B) SINIESTROS POR REEMBOLSO (GMM):
+Si el cliente pagó por su cuenta, debe recabar:
+- Facturas electrónicas (XML y PDF) a nombre del asegurado titular.
+- Informe Médico detallado, firmado y sellado por el médico tratante.
+- Solicitud de Reembolso debidamente llenada por el asegurado.
+- Recetas médicas y estudios de diagnóstico (radiografías, análisis de sangre, etc.) con sus respectivas facturas.
+
+C) SINIESTROS DE VIDA (Fallecimiento o Invalidez):
+- Notificar de inmediato al departamento de Siniestros de la Promotoría Ambriz.
+- Requisitos básicos para Reclamación de Vida:
+  * Acto de Defunción (original o copia certificada).
+  * Solicitud de Reclamación de Beneficiarios.
+  * Identificación y comprobante de domicilio de cada beneficiario.
+  * Acta de Nacimiento del asegurado y de los beneficiarios.
+  * Dictamen Médico del fallecimiento.
+
+2. CONTACTOS CLAVE DE SINIESTROS
+- **Línea Monterrey (SMNYL):** 800 505 4000 (disponible 24/7 para emergencias médicas).
+- **Responsable de Siniestros Promotoría Ambriz:** Lic. Mónica Vázquez (monica.vazquez@ambriz.com) - Ext. 104.
+- **WhatsApp de Emergencias de la Promotoría:** 55-1234-5678 (Solo urgencias).

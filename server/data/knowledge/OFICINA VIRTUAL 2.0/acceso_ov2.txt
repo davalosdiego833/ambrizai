@@ -1,0 +1,14 @@
+ACCESO A OFICINA VIRTUAL 2.0 (OV2) Y SMNYL CENTRAL
+
+Para acceder a la Oficina Virtual 2.0 (OV2) o a SMNYL Central, debes seguir estos pasos oficiales actualizados:
+
+1. Abre tu navegador (se recomienda usar Google Chrome para asegurar la compatibilidad).
+2. Ingresa al Portal de Asesores en la dirección: https://www.asesordeseguros.com.mx (o directamente a https://www.lineamonterrey.com.mx).
+3. Introduce tus credenciales (número de asesor y contraseña) para iniciar sesión.
+4. En el menú superior horizontal de color azul, dirígete a:
+   Consultas ➔ MI SMNYL Asesores
+5. Al posicionar el cursor sobre esa sección, se desplegarán las opciones. Selecciona la que necesites:
+   - **Oficina Virtual 2** (para trámites digitales de fondos, retiros, estados de cuenta, cambios de conducto de cobro, beneficiarios, etc.)
+   - **SMNYL Central**
+
+Nota: El antiguo camino que pasaba por el menú "Servicios ➔ Portal de Consultas" está obsoleto. La ruta directa actual es a través del menú "Consultas ➔ MI SMNYL Asesores".

@@ -1,0 +1,23 @@
+GUÍA DE FOLIOS Y TRÁMITES EN EL PORTAL DE ASESORES (SMNYL)
+
+1. SISTEMA DE TRÁMITES: PORTAL DE ASESORES (SMNYL)
+Es la plataforma oficial de Seguros Monterrey New York Life. Aquí es donde se ingresan y emiten formalmente los trámites utilizando las Oficinas Virtuales (OV1 y OV2.0). Todo el proceso administrativo, cotización y carga de documentos se realiza directamente desde el Portal de Asesores de SMNYL.
+
+2. OFICINA VIRTUAL: CONDUCTOS DE INGRESO (OV1 y OV2.0)
+En el Portal de Asesores, existen dos conductos digitales para ingresar solicitudes:
+
+A) OV1 (Oficina Virtual 1):
+- Se utiliza principalmente para:
+  * Trámites tradicionales o de conservación.
+  * Cambios de conducto de cobro o rehabilitación de pólizas.
+  * Solicitudes que requieren formatos físicos escaneados de firmas autógrafas.
+  * Ciertos movimientos administrativos específicos indicados en la Matriz de Trámites.
+
+B) OV2.0 (Oficina Virtual 2.0):
+- Es el portal de nueva generación de SMNYL.
+- Se utiliza principalmente para:
+  * Emisión de Pólizas Nuevas (tanto de Vida como de Gastos Médicos Mayores GMM).
+  * Procesos rápidos que utilizan firma digital (Signaturit) y validación automatizada de documentos en tiempo real.
+  * Trámites 100% digitales sin papel.
+
+*Consulta siempre la "Matriz de trámites digitales" (PDF en la base de conocimientos) para validar cuál de las dos oficinas (OV1 u OV2.0) corresponde a tu trámite exacto.*

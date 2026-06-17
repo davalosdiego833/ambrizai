@@ -1,0 +1,8 @@
+node_modules
+.env
+data/chats.json
+data/folders.json
+data/users.json
+data/knowledge_validation_report.json
+backups/
+*.log

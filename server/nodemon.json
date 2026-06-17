@@ -1,0 +1,6 @@
+{
+  "ignore": [
+    "data/*.json",
+    "data/knowledge_validation_report.json"
+  ]
+}

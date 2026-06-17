@@ -1,0 +1,7 @@
+/* ═══════════════════════════════════════════════════════
+   AMBRIZ AI — Stylesheets Entrypoint
+   ═══════════════════════════════════════════════════════ */
+
+@import "./styles/index.css";
+@import "./styles/animations.css";
+@import "./styles/components.css";
