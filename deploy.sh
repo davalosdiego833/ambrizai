@@ -18,7 +18,7 @@ git push -u origin main
 echo "🌐 Conectando a Hostinger para actualizar el servidor..."
 ssh -i ~/.ssh/id_rsa_panel u211138134@195.35.10.40 -p 65002 << 'ENDSSH'
   export PATH=/opt/alt/alt-nodejs20/root/usr/bin:$PATH
-  cd domains/panel.ambrizydavalos.com/nodejs
+  cd domains/ai.ambrizydavalos.com/nodejs
   
   # Resguardar base de datos antes de jalar cambios
   if [ -f server/data/users.json ]; then
@@ -46,10 +46,13 @@ ssh -i ~/.ssh/id_rsa_panel u211138134@195.35.10.40 -p 65002 << 'ENDSSH'
   npm install --omit=dev
   
   echo "🔄 Reiniciando el servidor Node.js..."
-  cd ..
   mkdir -p tmp 2>/dev/null || true
   touch tmp/restart.txt 2>/dev/null || true
+  mkdir -p ../server/tmp 2>/dev/null || true
+  touch ../server/tmp/restart.txt 2>/dev/null || true
+  mkdir -p ../../public_html/tmp 2>/dev/null || true
+  touch ../../public_html/tmp/restart.txt 2>/dev/null || true
 ENDSSH
 
 echo "✅ ¡Despliegue Finalizado Exitosamente!"
-echo "Puedes revisar tu aplicación en: https://panel.ambrizydavalos.com"
+echo "Puedes revisar tu aplicación en: https://ai.ambrizydavalos.com"
