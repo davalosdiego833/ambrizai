@@ -236,6 +236,19 @@ export const api = {
     return res.json();
   },
 
+  async adminUpdateUser(userId, name, email, password, role) {
+    const res = await fetch(`${API_URL}/auth/admin/users/${userId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ name, email, password, role }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Error al actualizar usuario');
+    }
+    return res.json();
+  },
+
   async adminToggleBlock(userId, blocked) {
     const res = await fetch(`${API_URL}/auth/admin/users/${userId}/block`, {
       method: 'PUT',

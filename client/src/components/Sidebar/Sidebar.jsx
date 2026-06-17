@@ -557,7 +557,8 @@ function AdminModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(true);
   const [adminSearch, setAdminSearch] = useState('');
   
-  // Create user form state
+  // Create / Edit user form state
+  const [editingUserId, setEditingUserId] = useState(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -597,16 +598,32 @@ function AdminModal({ isOpen, onClose }) {
       return;
     }
     try {
-      await api.adminCreateUser(name, email, password, role);
-      setSuccessMessage('Usuario creado exitosamente');
+      if (editingUserId) {
+        await api.adminUpdateUser(editingUserId, name, email, password, role);
+        setSuccessMessage('Usuario actualizado exitosamente');
+        setEditingUserId(null);
+      } else {
+        await api.adminCreateUser(name, email, password, role);
+        setSuccessMessage('Usuario creado exitosamente');
+      }
       setName('');
       setEmail('');
       setPassword('');
       setRole('Asesor');
       fetchUsers();
     } catch (err) {
-      setErrorMessage(err.message || 'Error al crear el usuario');
+      setErrorMessage(err.message || 'Error al procesar la solicitud');
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUserId(null);
+    setName('');
+    setEmail('');
+    setPassword('');
+    setRole('Asesor');
+    setErrorMessage('');
+    setSuccessMessage('');
   };
 
   const handleToggleBlock = async (userId, currentlyBlocked) => {
@@ -742,6 +759,26 @@ function AdminModal({ isOpen, onClose }) {
                         </div>
 
                         <div className="user-row-actions">
+                          {/* Edit user details */}
+                          <button
+                            className="admin-btn edit-btn"
+                            onClick={() => {
+                              setEditingUserId(u.id);
+                              setName(u.name);
+                              setEmail(u.email);
+                              setPassword(u.passwordPlain || '');
+                              setRole(u.role);
+                              setErrorMessage('');
+                              setSuccessMessage('');
+                            }}
+                            title="Editar datos del usuario"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path>
+                            </svg>
+                          </button>
+
                           {/* Block/Unblock toggle */}
                           <button
                             className={`admin-btn ${u.blocked ? 'block-btn' : 'unblock-btn'}`}
@@ -784,7 +821,7 @@ function AdminModal({ isOpen, onClose }) {
 
             {/* Create New User Section */}
             <div className="admin-card">
-              <h3 className="admin-card-title">Añadir Nuevo Usuario</h3>
+              <h3 className="admin-card-title">{editingUserId ? 'Editar Datos de Usuario' : 'Añadir Nuevo Usuario'}</h3>
               
               <form onSubmit={handleCreateUser} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div className="admin-form-group">
@@ -836,8 +873,18 @@ function AdminModal({ isOpen, onClose }) {
                 </div>
 
                 <button type="submit" className="admin-submit-btn">
-                  Crear Cuenta de Usuario
+                  {editingUserId ? 'Actualizar Cuenta' : 'Crear Cuenta de Usuario'}
                 </button>
+                {editingUserId && (
+                  <button
+                    type="button"
+                    className="admin-submit-btn"
+                    onClick={handleCancelEdit}
+                    style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+                  >
+                    Cancelar Edición
+                  </button>
+                )}
               </form>
             </div>
 

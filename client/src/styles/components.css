@@ -1519,6 +1519,10 @@
   color: var(--danger);
   background: rgba(239, 68, 68, 0.1);
 }
+.admin-btn.edit-btn:hover {
+  color: var(--text-accent);
+  background: rgba(37, 99, 235, 0.1);
+}
 .user-blocked-badge {
   font-size: 9px;
   padding: 2px 6px;

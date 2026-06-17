@@ -187,4 +187,57 @@ router.delete('/admin/users/:id', authMiddleware, adminOnly, (req, res) => {
   res.json({ success: true, message: 'Usuario eliminado' });
 });
 
+// Update user details (for Admin)
+router.put('/admin/users/:id', authMiddleware, adminOnly, async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !role) {
+    return res.status(400).json({ message: 'Nombre, correo y rol son requeridos' });
+  }
+
+  try {
+    const users = readUsersDB();
+    const userIndex = users.findIndex((u) => u.id === id);
+
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Check if email is already taken by another user
+    const emailExists = users.some((u) => u.email.toLowerCase() === email.toLowerCase() && u.id !== id);
+    if (emailExists) {
+      return res.status(400).json({ message: 'El correo electrónico ya está registrado por otro usuario' });
+    }
+
+    const user = users[userIndex];
+    user.name = name;
+    user.email = email.toLowerCase();
+    user.role = role;
+
+    if (password && password !== user.passwordPlain) {
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password, salt);
+      user.passwordHash = passwordHash;
+      user.passwordPlain = password;
+    }
+
+    writeUsersDB(users);
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        blocked: user.blocked
+      }
+    });
+  } catch (err) {
+    console.error('Error updating user:', err);
+    res.status(500).json({ message: 'Error al actualizar usuario' });
+  }
+});
+
 export default router;
