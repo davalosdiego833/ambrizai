@@ -26,7 +26,7 @@ export async function streamChatResponse(history, userMessage, onChunk, onDone, 
   }
 
   try {
-    const knowledgeBase = await getKnowledgeContext();
+    const knowledgeBase = await getKnowledgeContext(userMessage);
     const systemPrompt = `Eres Ambriz AI, un asistente inteligente de la Promotoría Ambriz, diseñado exclusivamente para ayudar a nuestros asesores de seguros de Seguros Monterrey New York Life (SMNYL).
 Tu objetivo es contestar cualquier pregunta sobre procesos administrativos, cómo subir folios, emitir pólizas, cobranza, siniestros y más, utilizando el conocimiento oficial provisto a continuación.
 
