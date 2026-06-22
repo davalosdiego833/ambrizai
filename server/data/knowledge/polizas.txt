@@ -12,11 +12,12 @@ Para emitir una póliza nueva, el asesor debe seguir los siguientes pasos:
   * Formato de Identificación del Cliente (PLD - Prevención de Lavado de Dinero).
 
 2. ESTADOS DE UNA EMISIÓN
-En el sistema de Promotoría/SMNYL, la solicitud pasará por los siguientes estados:
-- **Pendiente / En Espera:** Documentación en revisión por la promotoría.
+En el sistema de SMNYL, la solicitud pasará por los siguientes estados:
+- **Pendiente / En Espera:** Documentación en revisión por la mesa de control de SMNYL.
 - **En Suscripción:** El área médica o financiera de SMNYL está evaluando el riesgo.
 - **Requisitos Pendientes:** Falta algún documento, aclaración médica o firma. Se notifica al asesor de inmediato.
 - **Emitida:** La póliza ha sido creada. Se genera el PDF y se envía al correo del cliente y asesor.
+
 
 3. TIEMPOS DE RESPUESTA (SLA)
 - Productos de Vida Tradicionales (SeguBeca, Realiza, etc.): 3 a 5 días hábiles si no hay requisitos adicionales.

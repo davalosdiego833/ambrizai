@@ -7,7 +7,7 @@ A) GASTOS MÉDICOS MAYORES (GMM) - Urgencia o Accidente:
 - **Paso 1:** Recomendar al cliente acudir a un hospital de la red de SMNYL correspondiente a su plan (Básico, Integral, o Ejecutivo).
 - **Paso 2:** Presentar la credencial digital de SMNYL y su INE en la admisión del hospital.
 - **Paso 3:** Si la estancia hospitalaria supera las 24 horas, solicitar el "Reporte Médico" al médico tratante para tramitar el **Pago Directo** y evitar que el cliente pague de su bolsillo.
-- **Paso 4:** Enviar a la promotoría el número de reporte médico para seguimiento con el enlace hospitalario.
+- **Paso 4:** Enviar el número de reporte médico para seguimiento con el enlace hospitalario de SMNYL.
 
 B) SINIESTROS POR REEMBOLSO (GMM):
 Si el cliente pagó por su cuenta, debe recabar:
@@ -17,7 +17,7 @@ Si el cliente pagó por su cuenta, debe recabar:
 - Recetas médicas y estudios de diagnóstico (radiografías, análisis de sangre, etc.) con sus respectivas facturas.
 
 C) SINIESTROS DE VIDA (Fallecimiento o Invalidez):
-- Notificar de inmediato al departamento de Siniestros de la Promotoría Ambriz.
+- Notificar de inmediato al departamento de Siniestros de SMNYL.
 - Requisitos básicos para Reclamación de Vida:
   * Acto de Defunción (original o copia certificada).
   * Solicitud de Reclamación de Beneficiarios.
@@ -27,5 +27,4 @@ C) SINIESTROS DE VIDA (Fallecimiento o Invalidez):
 
 2. CONTACTOS CLAVE DE SINIESTROS
 - **Línea Monterrey (SMNYL):** 800 505 4000 (disponible 24/7 para emergencias médicas).
-- **Responsable de Siniestros Promotoría Ambriz:** Lic. Mónica Vázquez (monica.vazquez@ambriz.com) - Ext. 104.
-- **WhatsApp de Emergencias de la Promotoría:** 55-1234-5678 (Solo urgencias).
+
