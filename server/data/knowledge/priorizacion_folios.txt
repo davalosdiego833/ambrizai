@@ -1,0 +1,25 @@
+GUÍA PARA LA PRIORIZACIÓN DE FOLIOS EN EL PORTAL DE ASESORES (SMNYL)
+
+1. ¿QUÉ ES LA PRIORIZACIÓN DE FOLIOS Y PARA QUÉ SIRVE?
+La priorización es una funcionalidad que permite solicitar al equipo de operaciones de Seguros Monterrey New York Life (SMNYL) que enfoque sus esfuerzos en procesar determinados folios (emisiones iniciales o cambios administrativos) con mayor urgencia.
+- Objetivo principal: Asegurar que el trámite quede emitido y cobrado antes del cierre de mes, acumulando para bonos, campañas, cuaderno de concursos y premios del mes en curso.
+- Documento de referencia: El "Flash de cierre de mes" (PDF publicado a mediados de mes en el Portal de Asesores y en el grupo "Campañas y Premios") indica las fechas límites de ingreso para Oficina Virtual y SMNYL Central.
+
+2. DISPONIBILIDAD DE LA HERRAMIENTA
+La opción de priorizar folios NO está activa de forma permanente durante todo el mes. Se habilita de manera temporal en el Portal de Asesores únicamente cuando se aproxima la fecha de cierre de mes.
+
+3. PASO A PASO PARA PRIORIZAR UN FOLIO
+Para priorizar un folio que ingresaste por Oficina Virtual o SMNYL Central, sigue estos pasos en el Portal de Asesores:
+
+Paso 1: Inicia sesión en el Portal de Agentes / Asesores de SMNYL.
+Paso 2: En el menú principal, dirígete a la sección de "Consultas".
+Paso 3: En el menú superior de la sección de consultas, selecciona "Servicios".
+Paso 4: Haz clic en la opción "Priorizar trámites" (esta opción solo aparecerá si el portal se encuentra en período de cierre de mes).
+Paso 5: Visualizarás la lista de folios ingresados que son elegibles para priorizar. Ubica el folio que deseas priorizar.
+Paso 6: Haz clic en el icono de priorización (ubicado junto al folio correspondiente).
+Paso 7: El sistema solicitará indicar/justificar el conducto de cobro del trámite. Selecciona la opción adecuada según corresponda:
+        - "Cargo automático"
+        - "Modo Agente"
+Paso 8: Haz clic en el botón "Grabar".
+
+Una vez completados estos pasos, el folio quedará debidamente priorizado. En la tabla del portal podrás validar que en las columnas de "Causa de prioridad" y "Conducto de cobro" aparezcan reflejados los datos seleccionados. A partir de ese momento, el área de operaciones dará prioridad de procesamiento a tu folio.

@@ -1,0 +1,103 @@
+MANUAL DEL USO DEL PORTAL DE ASESORES - AMBRIZ Y DÁVALOS ASESORES FINANCIEROS (SMNYL)
+
+Este manual detalla los pasos para realizar las consultas, trámites, cobros y operaciones más frecuentes en el Portal de Asesores de Seguros Monterrey New York Life (SMNYL) (https://www.asesordeseguros.com.mx).
+
+---
+
+1. REFERENCIAS Y RECIBOS (GENERACIÓN DE COBROS Y CONSULTA)
+Para generar una referencia de pago o consultar/imprimir recibos cobrados de una póliza:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar la opción de "Consultas".
+Paso 3: Seleccionar "Pólizas".
+Paso 4: Buscar la póliza correspondiente e ingresar a ella.
+Paso 5: Seleccionar la sección "Recibos y Aportaciones".
+Paso 6:
+  - Para generar una referencia de cobro de un recibo con estatus "Pendiente": Seleccionar la opción "Generar Referencia" en la fila correspondiente.
+  - Para descargar o ver un recibo que ya está pagado: En la fila del recibo con estatus "Cobrado", seleccionar la opción "Imprimir".
+
+---
+
+2. SEGUIMIENTO A CARGO AUTOMÁTICO (COBRANZA)
+Para dar seguimiento a los cargos recurrentes a tarjetas bancarias:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar "Consultas" y luego "Seguimiento a cargo automático".
+Paso 3: Revisar la columna "Intentos" para verificar cuántos intentos de cobro ha realizado la compañía para cada recibo.
+Paso 4: [REGLA IMPORTANTE] En caso de que un recibo acumule MÁS DE 4 INTENTOS de cobro rechazados por la compañía, el asesor debe contactar de inmediato al cliente para explicarle la situación y coordinar una forma de pago alternativa antes de que la póliza se cancele.
+
+---
+
+3. CONSULTA DE COMISIONES
+Para consultar las comisiones generadas en un periodo específico:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar "Consultas".
+Paso 3: Seleccionar "Comisiones".
+Paso 4: Seleccionar el periodo de consulta deseado y dar clic en "Consultar".
+Paso 5: Para ver la información desglosada y el detalle por cliente, hacer clic en el botón "Detalle de cobranza" ubicado en la parte inferior de la tabla de resumen.
+
+---
+
+4. TIPO DE CAMBIO ACTUAL
+Para conocer el tipo de cambio diario utilizado por la compañía:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar "Consultas".
+Paso 3: En la parte inferior derecha de la pantalla principal de consultas, se mostrará el cuadro "Tipo de cambio" con el valor diario vigente del Dólar y la UDI.
+
+---
+
+5. ESTATUS DE TRÁMITES
+Para dar seguimiento a trámites administrativos o solicitudes ingresadas recientemente:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar "Consultas".
+Paso 3: Seleccionar la opción "Trámites".
+Paso 4: En esta sección aparecerán listados todos los trámites ingresados recientemente. Se puede hacer clic en cada uno de ellos para ver su estatus y requisitos pendientes en tiempo real.
+
+---
+
+6. DESCARGA DE FORMATOS OFICIALES
+Para obtener formatos de solicitudes y trámites:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: En la pantalla principal, seleccionar la opción "Catálogo de formatos".
+Paso 3: Se desplegará la lista de formatos oficiales de la compañía para ramos de Gastos Médicos Mayores (GMM) y Vida.
+
+---
+
+7. INFORMACIÓN DE PRODUCTOS
+Para revisar especificaciones, coberturas y condiciones de los planes:
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar la pestaña "Productos" en el menú de navegación superior.
+Paso 3: Se mostrará la oferta comercial de SMNYL dividida en:
+  - Salud Individual (ej. Alfa Medical, Alfa Medical Flex, etc.)
+  - Vida Individual (ej. Imagina Ser, Realiza, SeguBeca, etc.)
+  - Grupo y Colectivo.
+
+---
+
+8. CÓMO GENERAR REFERENCIA PARA APORTACIONES ADICIONALES (AVEs A CORTO PLAZO)
+Para generar la referencia bancaria para Aportaciones Voluntarias Adicionales (AVEs) desde el portal público de la aseguradora:
+Paso 1: Ingresar al sitio web público de SMNYL (https://www.mnyl.com.mx/).
+Paso 2: Seleccionar la opción "Bancos" / "Obtén tu referencia bancaria para pagar en diferentes sucursales".
+Paso 3: En la sección "Referencia en Línea", ingresar el número de póliza y completar la validación visual (capturar el texto de la imagen / captcha).
+Paso 4: Dar clic en "Buscar Póliza" para generar la referencia de pago correspondiente.
+
+---
+
+9. REPORTE DE PREMIOS Y CONCURSOS
+Para revisar el avance en campañas de ventas, metas y premios:
+Paso 1: Entrar al Portal de Asesores (https://www.asesordeseguros.com.mx).
+Paso 2: Seleccionar "Consultas".
+Paso 3: Seleccionar "Reportes".
+Paso 4: Hacer clic en "Premios" para visualizar el estatus de tus concursos y campañas acumuladas.
+
+---
+
+10. CÓMO GENERAR Y ENVIAR UN "MAIL ORDER" (COBRO A DISTANCIA Y MSI)
+El "Mail Order" es un formato de cobro digital para tarjetas de crédito o débito a distancia, útil cuando no se cuenta con firma física o se requiere aplicar promociones.
+Paso 1: Entrar al Portal de Asesores.
+Paso 2: Seleccionar "Consultas".
+Paso 3: Seleccionar "Pólizas".
+Paso 4: Buscar la póliza correspondiente ingresando el número, contratante o asegurado principal.
+Paso 5: En el extremo derecho de la fila de la póliza seleccionada, hacer clic en la opción "Mail Order".
+Paso 6: En la pantalla de generación de Mail Order (donde se visualizan los datos generales de la póliza), ingresar:
+  - Los primeros 6 dígitos de la tarjeta bancaria del cliente (para validación del banco emisor).
+  - Activar la casilla "Campaña a MSI" en caso de contar con una promoción de Meses Sin Intereses activa.
+Paso 7: Hacer clic en "Generar Mail Order" para procesar el cobro o emitir la solicitud.
