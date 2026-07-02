@@ -56,7 +56,7 @@ ${knowledgeBase}`;
     const chat = model.startChat({
       history: geminiHistory,
       generationConfig: {
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,
       },
     });
 

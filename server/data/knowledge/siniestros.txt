@@ -5,9 +5,7 @@ Cuando un asegurado sufra un siniestro (accidente, enfermedad, fallecimiento), e
 
 A) GASTOS MÉDICOS MAYORES (GMM) - Urgencia o Accidente:
 - **Paso 1:** Recomendar al cliente acudir a un hospital de la red de SMNYL correspondiente a su plan (Básico, Integral, o Ejecutivo).
-- **Paso 2:** Presentar la credencial digital de SMNYL y su INE en la admisión del hospital.
-- **Paso 3:** Si la estancia hospitalaria supera las 24 horas, solicitar el "Reporte Médico" al médico tratante para tramitar el **Pago Directo** y evitar que el cliente pague de su bolsillo.
-- **Paso 4:** Enviar el número de reporte médico para seguimiento con el enlace hospitalario de SMNYL.
+- **Paso 2:** Presentar la credencial digital de SMNYL o la carátula de su póliza, y su INE en la admisión del hospital.
 
 B) SINIESTROS POR REEMBOLSO (GMM):
 Si el cliente pagó por su cuenta, debe recabar:
