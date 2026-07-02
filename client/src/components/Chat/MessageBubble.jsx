@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import botAvatar from '../../assets/ambriz_ai_avatar.png';
 
 export default function MessageBubble({ message }) {
   const { sender, text, timestamp } = message;
@@ -95,7 +96,7 @@ export default function MessageBubble({ message }) {
   return (
     <div className={`message ${isBot ? 'bot' : 'user'}`}>
       <div className={`message-avatar ${isBot ? 'bot' : 'user'}`}>
-        {isBot ? 'A' : 'U'}
+        {isBot ? <img src={botAvatar} alt="Ambriz AI" /> : 'U'}
       </div>
       
       <div className="message-content">
