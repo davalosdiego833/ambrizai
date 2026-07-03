@@ -6,6 +6,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import chatRoutes from './routes/chat.js';
+import { getKnowledgeContext } from './services/knowledge.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,4 +63,14 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
   console.log(`👉 http://localhost:${PORT}`);
+  
+  // Pre-cargar la base de conocimientos al iniciar el servidor
+  console.log('⚡ Iniciando pre-carga de la base de conocimientos...');
+  getKnowledgeContext()
+    .then(() => {
+      console.log('✅ Base de conocimientos pre-cargada con éxito.');
+    })
+    .catch((err) => {
+      console.error('❌ Error al pre-cargar la base de conocimientos:', err);
+    });
 });
