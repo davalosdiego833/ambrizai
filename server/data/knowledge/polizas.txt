@@ -27,3 +27,12 @@ En el sistema de SMNYL, la solicitud pasará por los siguientes estados:
 - Las firmas digitales deben realizarse a través de la herramienta autorizada (Signaturit).
 - Si el cliente es extranjero, se requiere FM2 o FM3 vigente y pasaporte de su país de origen.
 - Toda corrección en la solicitud física debe ser inicialada por el solicitante; no se permiten tachaduras ni corrector líquido.
+
+5. RECONOCIMIENTO DE ANTIGÜEDAD EN GMM
+- Seguros Monterrey (SMNYL) reconoce un MÁXIMO de 2 años (24 meses) de antigüedad proveniente de otras compañías aseguradoras.
+- Independientemente de si el cliente tenía 5, 10 o más años de antigüedad con su aseguradora anterior, al cambiarse a SMNYL únicamente se le reconocerá y respetará un máximo de 2 años de antigüedad.
+- Este tope de 2 años es el límite operativo porque es suficiente para eliminar o reducir los periodos de espera estándar de la póliza (el periodo de espera más largo para enfermedades generales es de 2 años, cubriéndose a partir del inicio del 3er año).
+- El reconocimiento de antigüedad NO elimina ni reduce los periodos de espera para las siguientes coberturas (estas empiezan desde cero): Maternidad, Enfermedades Congénitas y Genéticas para Nacidos Fuera de Vigencia, Hernias, Cirugía Bariátrica, Cirugía Fetal, y SIDA/VIH.
+- El reconocimiento de antigüedad no cubre preexistencias ni siniestros ocurridos en la aseguradora previa.
+- Debe tramitarse y solicitarse dentro de los 90 días naturales posteriores a la fecha de inicio de vigencia de la póliza.
+
