@@ -349,7 +349,7 @@
 
 .sidebar.collapsed {
   transform: translateX(-100%);
-  margin-left: -var(--sidebar-width);
+  margin-left: calc(-1 * var(--sidebar-width));
 }
 
 .sidebar::before {
