@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import useAuth from './hooks/useAuth';
 import useChat from './hooks/useChat';
 import AnimatedBackground from './components/Layout/AnimatedBackground';
@@ -9,6 +10,7 @@ import Login from './components/Auth/Login';
 
 export default function App() {
   const { user, loading: authLoading, login, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const {
     chats,
     folders,
@@ -60,8 +62,14 @@ export default function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           activeChatId={activeChatId}
-          onSelectChat={selectChat}
-          onNewChat={handleNewChat}
+          onSelectChat={(chatId) => {
+            selectChat(chatId);
+            setSidebarOpen(false);
+          }}
+          onNewChat={() => {
+            handleNewChat();
+            setSidebarOpen(false);
+          }}
           onDeleteChat={deleteChat}
           onCreateFolder={createFolder}
           onRenameFolder={renameFolder}
@@ -70,9 +78,12 @@ export default function App() {
           onRenameChat={renameChat}
           user={user}
           onLogout={logout}
+          sidebarOpen={sidebarOpen}
+          onCloseSidebar={() => setSidebarOpen(false)}
         />
+        {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
         <div className="main-content">
-          <Header />
+          <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <ChatWindow
             messages={messages}
             isLoading={sending}

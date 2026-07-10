@@ -38,7 +38,7 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 let cachedDocs = null; // Array of { path: string, relativePath: string, ext: string, content: string }
 let lastLoadTime = 0;
 
-export async function getKnowledgeContext(query = null) {
+export async function getKnowledgeContext(query = null, history = []) {
   try {
     const allFiles = getAllFiles(KNOWLEDGE_DIR);
     
@@ -122,6 +122,46 @@ export async function getKnowledgeContext(query = null) {
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
       .replace(/[^a-z0-9\s]/g, " "); // remove special characters
     
+    // Detect mentioned products in query to prioritize their folders
+    const PRODUCTS = [
+      { key: 'vida mujer', keywords: ['vida mujer', 'mujer'] },
+      { key: 'imagina ser', keywords: ['imagina ser', 'imagina'] },
+      { key: 'nuevo plenitud', keywords: ['nuevo plenitud', 'plenitud'] },
+      { key: 'objetivo vida', keywords: ['objetivo vida', 'objetivo'] },
+      { key: 'orvi 99', keywords: ['orvi 99', 'orvi'] },
+      { key: 'segubeca', keywords: ['segubeca', 'beca', 'estudios'] },
+      { key: 'star dotal', keywords: ['star dotal', 'dotal'] },
+      { key: 'star temporal', keywords: ['star temporal', 'temporal'] }
+    ];
+
+    const mentionedProducts = [];
+    PRODUCTS.forEach(p => {
+      const isMentioned = p.keywords.some(k => cleanQuery.includes(k)) || cleanQuery.includes(p.key);
+      if (isMentioned) {
+        mentionedProducts.push(p.key);
+      }
+    });
+
+    // If no product is mentioned in the current query, scan the chat history (starting from the most recent)
+    if (mentionedProducts.length === 0 && history && history.length > 0) {
+      for (let i = history.length - 1; i >= 0; i--) {
+        const msgText = (history[i].text || '').toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9\s]/g, " ");
+
+        for (const p of PRODUCTS) {
+          const isMentioned = p.keywords.some(k => msgText.includes(k)) || msgText.includes(p.key);
+          if (isMentioned) {
+            mentionedProducts.push(p.key);
+          }
+        }
+        // Stop scanning further back if we found the active product in this turn
+        if (mentionedProducts.length > 0) {
+          break;
+        }
+      }
+    }
+
     const stopWords = new Set([
       "como", "hago", "un", "de", "en", "una", "y", "el", "la", "los", "las", 
       "para", "con", "del", "por", "que", "cual", "cuales", "son", "se", "mi", 
@@ -137,16 +177,38 @@ export async function getKnowledgeContext(query = null) {
       return context;
     }
 
-    // Rank PDF documents based on keyword occurrence
+    // Rank PDF documents based on keyword occurrence and product mapping
     const rankedPdfs = pdfDocs.map(doc => {
       let score = 0;
       const docPathLower = doc.relativePath.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      // Remove root folder name to prevent matching the word "vida" from "PORTAFOLIO DE PRODUCTOS VIDA" on every single file path
+      const cleanDocPath = docPathLower.replace(/^portafolio de productos vida\//, "");
       const docContentLower = doc.content.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+      // Determine if this file belongs to a specific product
+      let docProductKey = null;
+      for (const p of PRODUCTS) {
+        if (docPathLower.includes(p.key)) {
+          docProductKey = p.key;
+          break;
+        }
+      }
+
+      // Apply product alignment rules
+      if (mentionedProducts.length > 0 && docProductKey) {
+        if (mentionedProducts.includes(docProductKey)) {
+          // Strong boost for matching products
+          score += 1500;
+        } else {
+          // Penalize documents of OTHER products if the query explicitly requested a specific product
+          score -= 1000;
+        }
+      }
+
       keywords.forEach(kw => {
-        // High priority if keyword is in the file title/path
-        if (docPathLower.includes(kw)) {
-          score += 100;
+        // High priority if keyword is in the file title/path (excluding root folder name)
+        if (cleanDocPath.includes(kw)) {
+          score += 150;
         }
         // Count occurrences in contents
         const regex = new RegExp(kw, 'g');
@@ -166,6 +228,9 @@ export async function getKnowledgeContext(query = null) {
 
     console.log(`🔍 Búsqueda de Contexto para: "${query}"`);
     console.log(`   Palabras clave: [${keywords.join(', ')}]`);
+    if (mentionedProducts.length > 0) {
+      console.log(`   Productos detectados: [${mentionedProducts.join(', ')}]`);
+    }
     console.log(`   PDFs seleccionados: ${selectedPdfs.map(d => d.relativePath).join(', ') || 'Ninguno'}`);
 
     for (const doc of selectedPdfs) {

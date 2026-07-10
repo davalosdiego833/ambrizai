@@ -17,6 +17,8 @@ export default function Sidebar({
   onRenameChat,
   user,
   onLogout,
+  sidebarOpen,
+  onCloseSidebar,
 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [collapsedFolders, setCollapsedFolders] = useState({});
@@ -120,9 +122,15 @@ export default function Sidebar({
 
   const unassignedChats = chats.filter((c) => !c.folderId);
 
+  const sidebarClasses = [
+    'sidebar',
+    !sidebarOpen ? 'collapsed' : '',
+    sidebarOpen ? 'open' : ''
+  ].filter(Boolean).join(' ');
+
   return (
     <>
-      <aside className="sidebar">
+      <aside className={sidebarClasses}>
         {/* Header with Search Toggle */}
         <div className="sidebar-header">
           <div className="logo-container">
@@ -144,6 +152,19 @@ export default function Sidebar({
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
           </button>
+
+          {onCloseSidebar && (
+            <button
+              className="sidebar-close-btn"
+              onClick={onCloseSidebar}
+              title="Cerrar panel"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Search input field */}
