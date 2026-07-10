@@ -14,6 +14,10 @@ git add .
 git commit -m "Despliegue a Producción $(date +'%Y-%m-%d %H:%M')"
 git push -u origin main
 
+# 2.5 Subir compilación de React a public_html
+echo "📤 Subiendo la compilación de la interfaz (React) a public_html..."
+scp -P 65002 -i ~/.ssh/id_rsa_panel -r client/dist/index.html client/dist/assets u211138134@195.35.10.40:domains/ai.ambrizydavalos.com/public_html/
+
 # 3. Conectar a Hostinger vía SSH y descargar código
 echo "🌐 Conectando a Hostinger para actualizar el servidor..."
 ssh -i ~/.ssh/id_rsa_panel u211138134@195.35.10.40 -p 65002 << 'ENDSSH'
