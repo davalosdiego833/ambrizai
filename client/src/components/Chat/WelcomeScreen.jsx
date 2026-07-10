@@ -62,7 +62,7 @@ export default function WelcomeScreen({ onQuickAction }) {
       <div className="logo-container welcome-avatar-container">
         <div className="logo-glow"></div>
         <div className="logo-icon logo-lg">
-          <video src="/video.mp4" autoPlay loop muted playsInline className="logo-video" />
+          <img src="/avatar.png" alt="Avatar" className="logo-img" />
         </div>
       </div>
 

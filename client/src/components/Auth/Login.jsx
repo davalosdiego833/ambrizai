@@ -38,7 +38,7 @@ export default function Login({ onLogin }) {
           <div className="login-logo">
             <div className="logo-glow"></div>
             <div className="logo-icon logo-md">
-              <video src="/video.mp4" autoPlay loop muted playsInline className="logo-video" />
+              <img src="/avatar.png" alt="Avatar" className="logo-img" />
             </div>
           </div>
           <h2 className="login-title gradient-text">Ambriz AI</h2>
