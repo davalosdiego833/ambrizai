@@ -37,7 +37,9 @@ export default function Login({ onLogin }) {
         <div className="login-header">
           <div className="login-logo">
             <div className="logo-glow"></div>
-            <div className="logo-icon logo-md">A</div>
+            <div className="logo-icon logo-md">
+              <video src="/video.mp4" autoPlay loop muted playsInline className="logo-video" />
+            </div>
           </div>
           <h2 className="login-title gradient-text">Ambriz AI</h2>
           <p className="login-desc">Portal exclusivo para asesores</p>

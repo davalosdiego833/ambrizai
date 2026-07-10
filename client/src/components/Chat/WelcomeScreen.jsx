@@ -59,9 +59,11 @@ export default function WelcomeScreen({ onQuickAction }) {
 
   return (
     <div className="welcome-screen">
-      <div className="logo-container" style={{ width: 80, height: 80 }}>
-        <div className="logo-glow" style={{ inset: -12, filter: 'blur(20px)' }}></div>
-        <div className="logo-icon logo-lg">A</div>
+      <div className="logo-container welcome-avatar-container">
+        <div className="logo-glow"></div>
+        <div className="logo-icon logo-lg">
+          <video src="/video.mp4" autoPlay loop muted playsInline className="logo-video" />
+        </div>
       </div>
 
       <h2 className="welcome-title gradient-text">¿En qué puedo ayudarte hoy?</h2>

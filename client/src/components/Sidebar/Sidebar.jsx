@@ -135,7 +135,9 @@ export default function Sidebar({
         <div className="sidebar-header">
           <div className="logo-container">
             <div className="logo-glow"></div>
-            <div className="logo-icon logo-sm">A</div>
+            <div className="logo-icon logo-sm">
+              <img src="/avatar.png" alt="Avatar" className="logo-img" />
+            </div>
           </div>
           <div className="logo-text">
             <h1 className="gradient-text">Ambriz AI</h1>
