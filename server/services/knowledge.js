@@ -7,10 +7,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const KNOWLEDGE_DIR = path.join(__dirname, '../data/knowledge');
+const CACHE_FILE = path.join(__dirname, '../data/pdf_cache.json');
 
 // Ensure knowledge directory exists
 if (!fs.existsSync(KNOWLEDGE_DIR)) {
   fs.mkdirSync(KNOWLEDGE_DIR, { recursive: true });
+}
+
+// Load persistent PDF cache from disk
+let pdfCache = {};
+try {
+  if (fs.existsSync(CACHE_FILE)) {
+    pdfCache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+    console.log('📦 Caché persistente de PDFs cargada desde disco.');
+  }
+} catch (err) {
+  console.error('Error al cargar caché persistente de PDFs:', err);
 }
 
 // Helper function to recursively read files in a directory
@@ -57,8 +69,9 @@ export async function getKnowledgeContext(query = null, history = []) {
 
     // If cache is empty or files have been modified, load docs into memory
     if (!cachedDocs || maxMtime > lastLoadTime) {
-      console.log('🔄 Reconstruyendo el caché de conocimientos (esto puede tardar unos segundos)...');
+      console.log('🔄 Reconstruyendo el caché de conocimientos...');
       const docs = [];
+      let cacheUpdated = false;
 
       for (const filePath of allFiles) {
         const ext = path.extname(filePath).toLowerCase();
@@ -74,19 +87,53 @@ export async function getKnowledgeContext(query = null, history = []) {
           });
         } else if (ext === '.pdf') {
           try {
-            const dataBuffer = fs.readFileSync(filePath);
-            const uint8Array = new Uint8Array(dataBuffer);
-            const parser = new PDFParse({ data: uint8Array });
-            const parsedPdf = await parser.getText();
-            docs.push({
-              path: filePath,
-              relativePath,
-              ext,
-              content: parsedPdf.text
-            });
+            const stats = fs.statSync(filePath);
+            const mtimeMs = stats.mtimeMs;
+            const size = stats.size;
+
+            // Use cached text if size and mod time match
+            if (pdfCache[relativePath] && pdfCache[relativePath].mtimeMs === mtimeMs && pdfCache[relativePath].size === size) {
+              docs.push({
+                path: filePath,
+                relativePath,
+                ext,
+                content: pdfCache[relativePath].content
+              });
+            } else {
+              console.log(`📄 Procesando nuevo o modificado PDF: ${relativePath}...`);
+              const dataBuffer = fs.readFileSync(filePath);
+              const uint8Array = new Uint8Array(dataBuffer);
+              const parser = new PDFParse({ data: uint8Array });
+              const parsedPdf = await parser.getText();
+              const parsedText = parsedPdf.text;
+
+              docs.push({
+                path: filePath,
+                relativePath,
+                ext,
+                content: parsedText
+              });
+
+              pdfCache[relativePath] = {
+                mtimeMs,
+                size,
+                content: parsedText
+              };
+              cacheUpdated = true;
+            }
           } catch (pdfErr) {
             console.error(`Error al procesar PDF ${relativePath}:`, pdfErr);
           }
+        }
+      }
+
+      // Save updated cache back to disk
+      if (cacheUpdated) {
+        try {
+          fs.writeFileSync(CACHE_FILE, JSON.stringify(pdfCache, null, 2));
+          console.log('💾 Caché persistente de PDFs guardada en disco.');
+        } catch (err) {
+          console.error('Error al guardar caché persistente de PDFs:', err);
         }
       }
 
