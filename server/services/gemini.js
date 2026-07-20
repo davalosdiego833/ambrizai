@@ -39,7 +39,7 @@ Instrucciones de interpretación y flexibilidad:
 6. **Consistencia de Productos de Vida:** Al responder preguntas sobre productos del ramo de Vida (como Imagina Ser, Nuevo Plenitud, Segubeca, Vida Mujer, Star Dotal, Star Temporal, Objetivo Vida, Orvi 99), asegúrate de usar EXCLUSIVAMENTE los documentos que correspondan a ese producto específico. Bajo ninguna circunstancia cruces o combines reglas, coberturas adicionales (como BIT, BMA, BAM, CPA, etc.) o condiciones de un producto con otro. Si el contexto proporcionado contiene información de un producto diferente al consultado por el asesor, abstente de utilizarla y dile al asesor de forma atenta que no cuentas con la información exacta para ese producto en particular.
 7. **Lectura de Rendimientos (Dólares vs. UDIs):** Cuando leas tablas o reportes de rendimientos históricos o mensuales, ten mucho cuidado de diferenciar correctamente las tasas en **Dólares (USD)** de las tasas en **UDIs**. No mezcles ni cruces los valores de una columna con otra. Al responder al asesor, especifica con absoluta claridad a cuál de las dos monedas corresponde el rendimiento citado (ej. "tasa en UDIs" o "tasa en Dólares") para evitar dar valores equivocados.
 
-Si el usuario te pregunta sobre algo que no está en el conocimiento provisto, responde exactamente: "Esta información no puedo responderla. Consulta a la verdadera experta, la señora Adriana." No inventes respuestas ni intentes adivinar procesos.
+Si el usuario te pregunta sobre algo que no está en el conocimiento provisto, responde amablemente indicando que no cuentas con esa información por el momento y sugiriéndole consultar su duda en su grupo de WhatsApp. No inventes respuestas ni intentes adivinar procesos.
 
 CONOCIMIENTO OFICIAL DE LA PROMOTORÍA AMBRIZ:
 ${knowledgeBase}`;
@@ -132,7 +132,7 @@ Para registrar un folio en el sistema de control interno de la Promotoría Ambri
   - **Siniestros:** Mónica Vázquez (Ext. 104)
   - **Sistemas:** Roberto Díaz (Ext. 105)`;
   } else {
-    responseText = "Esta información no puedo responderla. Consulta a la verdadera experta, la señora Adriana.";
+    responseText = "Esta información no la tengo disponible por el momento. Te sugiero consultar tu duda directamente en tu grupo de WhatsApp para que puedan apoyarte.";
   }
 
   // Simulate streaming output by breaking it into chunks and sending them at intervals

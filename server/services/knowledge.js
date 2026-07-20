@@ -178,7 +178,10 @@ export async function getKnowledgeContext(query = null, history = []) {
       { key: 'orvi 99', keywords: ['orvi 99', 'orvi'] },
       { key: 'segubeca', keywords: ['segubeca', 'beca', 'estudios'] },
       { key: 'star dotal', keywords: ['star dotal', 'dotal'] },
-      { key: 'star temporal', keywords: ['star temporal', 'temporal'] }
+      { key: 'star temporal', keywords: ['star temporal', 'temporal'] },
+      { key: 'alfa medical', keywords: ['alfa medical', 'alfa'] },
+      { key: 'suma proteccion', keywords: ['suma proteccion', 'suma protección', 'deducible exceso'] },
+      { key: 'gastos medicos', keywords: ['gastos medicos', 'gastos médicos', 'gmm'] }
     ];
 
     const mentionedProducts = [];
