@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Páginas para Asesores | Ambriz & Dávalos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(18, 24, 38, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --primary-gold: #D4AF37;
+      --gold-glow: rgba(212, 175, 55, 0.25);
+      --accent-blue: #007AFF;
+      --accent-purple: #9C27B0;
+      --accent-green: #00E676;
+      --accent-orange: #FF9800;
+      --text-white: #ffffff;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.12) 0%, transparent 40%);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      overflow-x: hidden;
+    }
+
+    /* Print Header Controls */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 16px;
+      max-width: 840px;
+      width: 100%;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, #D4AF37 0%, #AA820A 100%);
+      color: #000;
+      border: none;
+      box-shadow: 0 4px 16px var(--gold-glow);
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 840px;
+      background: rgba(13, 18, 30, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px 36px 28px 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #007AFF, #D4AF37, #9C27B0, #00E676);
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .logo {
+      height: 44px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.2));
+    }
+
+    .badge-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 20px;
+      color: var(--primary-gold);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Grid of Portals */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .card.blue .card-icon-wrapper { background: rgba(0, 122, 255, 0.15); border: 1px solid rgba(0, 122, 255, 0.3); color: #007AFF; }
+    .card.purple .card-icon-wrapper { background: rgba(156, 39, 176, 0.15); border: 1px solid rgba(156, 39, 176, 0.3); color: #E040FB; }
+    .card.green .card-icon-wrapper { background: rgba(0, 230, 118, 0.15); border: 1px solid rgba(0, 230, 118, 0.3); color: #00E676; }
+    .card.gold .card-icon-wrapper { background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.3); color: #D4AF37; }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      margin-bottom: 12px;
+      flex-grow: 1;
+    }
+
+    .features-list {
+      list-style: none;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .features-list li {
+      font-size: 0.77rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.35;
+    }
+
+    .features-list li::before {
+      content: '✓';
+      font-weight: 900;
+      color: var(--primary-gold);
+    }
+
+    .card-link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      word-break: break-word;
+    }
+
+    .card.blue .card-link-btn:hover { background: #007AFF; border-color: #007AFF; color: #fff; }
+    .card.purple .card-link-btn:hover { background: #9C27B0; border-color: #9C27B0; color: #fff; }
+    .card.green .card-link-btn:hover { background: #00C853; border-color: #00C853; color: #fff; }
+    .card.gold .card-link-btn:hover { background: #D4AF37; border-color: #D4AF37; color: #000; }
+
+    .url-text {
+      opacity: 0.9;
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--glass-border);
+      padding-top: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px 10px;
+        align-items: stretch;
+      }
+      .action-bar {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .btn-action {
+        width: 100%;
+        justify-content: center;
+      }
+      .container {
+        padding: 24px 18px 20px 18px;
+        border-radius: 18px;
+      }
+      .logo {
+        height: 38px;
+        margin-bottom: 8px;
+      }
+      .title {
+        font-size: 1.4rem;
+      }
+      .subtitle {
+        font-size: 0.8rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .card {
+        padding: 16px;
+      }
+      .card-link-btn {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+
+    /* Print Specific Styling - Exactly 1 Portrait Page */
+    @page {
+      size: letter portrait;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #090d16 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .container {
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        padding: 24px 32px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+        transform: scale(0.95) !important;
+        transform-origin: top center !important;
+      }
+      .grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      .card {
+        break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print & Download Control Bar -->
+  <div class="action-bar">
+    <button class="btn-action primary" onclick="downloadPNG()">
+      🖼️ Descargar Imagen (1 Hoja HD)
+    </button>
+    <button class="btn-action" onclick="window.print()">
+      📄 Imprimir / Guardar PDF (1 Hoja)
+    </button>
+  </div>
+
+  <!-- Main Infographic Container -->
+  <div class="container" id="infografia">
+    <!-- Header -->
+    <div class="header">
+      <img src="https://panel.ambrizydavalos.com/assets/logos/empresa/ambriz_logo.png" alt="Ambriz & Dávalos" class="logo" onerror="this.style.display='none'">
+      <div>
+        <span class="badge-tag">GUÍA RÁPIDA DE PORTALES</span>
+      </div>
+      <h1 class="title">Ecosistema Digital para Asesores</h1>
+      <p class="subtitle">Conoce las herramientas oficiales de Promotoría Ambriz & Dávalos para potenciar tu desempeño comercial y operativo.</p>
+    </div>
+
+    <!-- Grid Layout (2x2 on Desktop, 1 Col on Mobile) -->
+    <div class="grid">
+
+      <!-- 1. Panel de Campañas -->
+      <div class="card blue">
+        <div class="card-header-row">
+          <div class="card-icon-wrapper">📊</div>
+          <h3 class="card-title">Panel de Campañas</h3>
+        </div>
+        <p class="card-desc">Monitoreo en tiempo real de tu avance, métricas y resultados en todas las campañas de la promotoría.</p>
+        <ul class="features-list">
+          <li>Avance en MDRT, Camino a la Cumbre y Graduación.</li>
+          <li>Resultados en Convenciones, Legión Centurión y Proactiva Tech.</li>
+          <li>Tableros de posiciones y logro de metas.</li>
+        </ul>
+        <a href="https://panel.ambrizydavalos.com" target="_blank" class="card-link-btn">
+          <span class="url-text">panel.ambrizydavalos.com</span>
+          <span>Ir al Portal ↗</span>
+        </a>
+      </div>
+
+      <!-- 2. Ambriz AI -->
+      <div class="card purple">
+        <div class="card-header-row">
+          <div class="card-icon-wrapper">🤖</div>
+          <h3 class="card-title">Ambriz AI — Asistente</h3>
+        </div>
+        <p class="card-desc">Tu copiloto de consulta inteligente para resolver dudas operativas, políticas y trámites de inmediato.</p>
+        <ul class="features-list">
+          <li>Consultas rápidas sobre condiciones de Vida y GMM.</li>
+          <li>Matriz de trámites y solicitudes paso a paso.</li>
+          <li>Acceso 24/7 a manuales y normativas vigentes.</li>
+        </ul>
+        <a href="https://ai.ambrizydavalos.com" target="_blank" class="card-link-btn">
+          <span class="url-text">ai.ambrizydavalos.com</span>
+          <span>Ir a Ambriz AI ↗</span>
+        </a>
+      </div>
+
+      <!-- 3. CRM A&D -->
+      <div class="card green">
+        <div class="card-header-row">
+          <div class="card-icon-wrapper">💼</div>
+          <h3 class="card-title">CRM Ambriz & Dávalos</h3>
+        </div>
+        <p class="card-desc">Plataforma estratégica para la administración completa de tu cartera de clientes y prospectos.</p>
+        <ul class="features-list">
+          <li>Control total de prospectos y pólizas vigentes.</li>
+          <li>Alertas automáticas de fechas de cobro.</li>
+          <li>Estadísticas e indicadores clave de rendimiento.</li>
+        </ul>
+        <a href="https://crm.ambrizydavalos.com" target="_blank" class="card-link-btn">
+          <span class="url-text">crm.ambrizydavalos.com</span>
+          <span>Ir al CRM ↗</span>
+        </a>
+      </div>
+
+      <!-- 4. Portal de Asesores -->
+      <div class="card gold">
+        <div class="card-header-row">
+          <div class="card-icon-wrapper">🎓</div>
+          <h3 class="card-title">Portal de Asesores</h3>
+        </div>
+        <p class="card-desc">Repositorio de capacitación, materiales de venta y herramientas dinámicas para presentaciones comerciales.</p>
+        <ul class="features-list">
+          <li>Apoyos visuales para Cita Inicial y Cita de Cierre.</li>
+          <li>Sistema de seguimiento de 25 Puntos.</li>
+          <li>Materiales de estudio y guía para el vendedor.</li>
+        </ul>
+        <a href="https://proyecto.ambrizydavalos.com" target="_blank" class="card-link-btn">
+          <span class="url-text">proyecto.ambrizydavalos.com</span>
+          <span>Ir al Proyecto ↗</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>Herramientas Oficiales para Asesores</span>
+    </div>
+  </div>
+
+  <script>
+    async function downloadPNG() {
+      const el = document.getElementById('infografia');
+      const canvas = await html2canvas(el, {
+        backgroundColor: '#090d16',
+        scale: 3,
+        useCORS: true,
+        logging: false
+      });
+      const link = document.createElement('a');
+      link.download = 'infografia_portales_asesores_ambriz_davalos.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
