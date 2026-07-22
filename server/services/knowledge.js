@@ -171,6 +171,12 @@ export async function getKnowledgeContext(query = null, history = []) {
     
     // Detect mentioned products in query to prioritize their folders
     const PRODUCTS = [
+      { key: 'medicos a tu lado', keywords: ['medicos a tu lado', 'médicos a tu lado', 'doctores'] },
+      { key: 'alfa medical', keywords: ['alfa medical', 'alfa'] },
+      { key: 'suma proteccion', keywords: ['suma proteccion', 'suma protección', 'deducible exceso'] },
+      { key: 'fair play', keywords: ['fair play', 'fairplay', 'traspaso', 'traspasos', 'malas practicas', 'malas prácticas'] },
+      { key: 'cuaderno de concursos', keywords: ['cuaderno', 'concurso', 'concursos', 'campana', 'campanas', 'campaña', 'campañas', 'bono', 'bonos', 'convencion', 'convención'] },
+      { key: 'comisiones', keywords: ['comision', 'comisiones', 'comisiona', 'comisionar', 'porcentaje'] },
       { key: 'vida mujer', keywords: ['vida mujer', 'mujer'] },
       { key: 'imagina ser', keywords: ['imagina ser', 'imagina'] },
       { key: 'nuevo plenitud', keywords: ['nuevo plenitud', 'plenitud'] },
@@ -179,14 +185,15 @@ export async function getKnowledgeContext(query = null, history = []) {
       { key: 'segubeca', keywords: ['segubeca', 'beca', 'estudios'] },
       { key: 'star dotal', keywords: ['star dotal', 'dotal'] },
       { key: 'star temporal', keywords: ['star temporal', 'temporal'] },
-      { key: 'alfa medical', keywords: ['alfa medical', 'alfa'] },
-      { key: 'suma proteccion', keywords: ['suma proteccion', 'suma protección', 'deducible exceso'] },
       { key: 'gastos medicos', keywords: ['gastos medicos', 'gastos médicos', 'gmm'] }
     ];
 
     const mentionedProducts = [];
     PRODUCTS.forEach(p => {
-      const isMentioned = p.keywords.some(k => cleanQuery.includes(k)) || cleanQuery.includes(p.key);
+      const isMentioned = p.keywords.some(k => {
+        const cleanK = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return cleanQuery.includes(cleanK);
+      }) || cleanQuery.includes(p.key);
       if (isMentioned) {
         mentionedProducts.push(p.key);
       }
@@ -200,7 +207,10 @@ export async function getKnowledgeContext(query = null, history = []) {
           .replace(/[^a-z0-9\s]/g, " ");
 
         for (const p of PRODUCTS) {
-          const isMentioned = p.keywords.some(k => msgText.includes(k)) || msgText.includes(p.key);
+          const isMentioned = p.keywords.some(k => {
+            const cleanK = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return msgText.includes(cleanK);
+          }) || msgText.includes(p.key);
           if (isMentioned) {
             mentionedProducts.push(p.key);
           }
