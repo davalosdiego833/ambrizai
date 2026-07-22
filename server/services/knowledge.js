@@ -171,11 +171,12 @@ export async function getKnowledgeContext(query = null, history = []) {
     
     // Detect mentioned products in query to prioritize their folders
     const PRODUCTS = [
+      { key: 'campanas', keywords: ['campana', 'campanas', 'campaña', 'campañas', 'graduacion', 'graduación', 'mdrt', 'aspirante 1', 'aspirante 2', 'aspirante', 'cumbre', 'legion centurion', 'legión centurión', 'rda', 'convenciones'] },
       { key: 'medicos a tu lado', keywords: ['medicos a tu lado', 'médicos a tu lado', 'doctores'] },
       { key: 'alfa medical', keywords: ['alfa medical', 'alfa'] },
       { key: 'suma proteccion', keywords: ['suma proteccion', 'suma protección', 'deducible exceso'] },
       { key: 'fair play', keywords: ['fair play', 'fairplay', 'traspaso', 'traspasos', 'malas practicas', 'malas prácticas'] },
-      { key: 'cuaderno de concursos', keywords: ['cuaderno', 'concurso', 'concursos', 'campana', 'campanas', 'campaña', 'campañas', 'bono', 'bonos', 'convencion', 'convención'] },
+      { key: 'cuaderno de concursos', keywords: ['cuaderno', 'concurso', 'concursos', 'bono', 'bonos'] },
       { key: 'comisiones', keywords: ['comision', 'comisiones', 'comisiona', 'comisionar', 'porcentaje'] },
       { key: 'vida mujer', keywords: ['vida mujer', 'mujer'] },
       { key: 'imagina ser', keywords: ['imagina ser', 'imagina'] },
