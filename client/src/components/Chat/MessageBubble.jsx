@@ -80,15 +80,58 @@ export default function MessageBubble({ message }) {
   };
 
   const parseInlineFormatting = (inlineText, baseKey) => {
-    // Regex for bold text: **text**
-    const parts = inlineText.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+    if (!inlineText) return '';
+
+    // Regex matches markdown links [text](url), bold **text**, code `text`, or raw URLs http(s)://...
+    const regex = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|`[^`]+`|https?:\/\/[^\s<)]+)/g;
+    const parts = inlineText.split(regex);
+
     return parts.map((part, index) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
+      if (!part) return null;
+
+      // Markdown link: [label](url)
+      const mdLinkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (mdLinkMatch) {
+        const label = mdLinkMatch[1];
+        const url = mdLinkMatch[2];
+        return (
+          <a
+            key={`${baseKey}-${index}`}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="chat-link"
+          >
+            {label} ↗
+          </a>
+        );
+      }
+
+      // Bold text: **text**
+      if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
         return <strong key={`${baseKey}-${index}`}>{part.slice(2, -2)}</strong>;
       }
-      if (part.startsWith('`') && part.endsWith('`')) {
+
+      // Inline code: `code`
+      if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
         return <code key={`${baseKey}-${index}`} className="inline-code">{part.slice(1, -1)}</code>;
       }
+
+      // Raw URL: https://... or http://...
+      if (part.startsWith('http://') || part.startsWith('https://')) {
+        return (
+          <a
+            key={`${baseKey}-${index}`}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="chat-link"
+          >
+            {part} ↗
+          </a>
+        );
+      }
+
       return part;
     });
   };

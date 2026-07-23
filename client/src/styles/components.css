@@ -1693,3 +1693,22 @@
   from { transform: translateY(-8px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ── Interactive Chat Links ── */
+.chat-link {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  word-break: break-word !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  cursor: pointer !important;
+}
+
+.chat-link:hover {
+  color: #1d4ed8 !important;
+  opacity: 0.85 !important;
+}
