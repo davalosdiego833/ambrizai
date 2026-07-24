@@ -295,7 +295,8 @@ export async function getKnowledgeContext(query = null, history = []) {
     console.log(`   PDFs seleccionados: ${selectedPdfs.map(d => d.relativePath).join(', ') || 'Ninguno'}`);
 
     for (const doc of selectedPdfs) {
-      context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
+      const docContent = extractRelevantContent(doc.content, keywords, 30000);
+      context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${docContent}\n=== FIN DE DOCUMENTO ===\n`;
     }
 
     return context;
@@ -303,4 +304,46 @@ export async function getKnowledgeContext(query = null, history = []) {
     console.error('Error al leer el conocimiento:', err);
     return 'Error al cargar los documentos de conocimiento.';
   }
+}
+
+function extractRelevantContent(content, keywords, maxChars = 30000) {
+  if (!content || content.length <= maxChars) return content;
+  
+  const paragraphs = content.split(/(?:\r?\n){2,}/);
+  const blocks = paragraphs.length > 5 ? paragraphs : content.split(/(?:\r?\n)/);
+  
+  const scored = blocks.map((block, idx) => {
+    let score = 0;
+    const blockLower = block.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    keywords.forEach(kw => {
+      if (kw && blockLower.includes(kw)) {
+        score += 10;
+      }
+    });
+    return { idx, block, score };
+  });
+
+  const matching = scored.filter(b => b.score > 0).sort((a, b) => b.score - a.score);
+
+  if (matching.length === 0) {
+    return content.slice(0, maxChars) + '\n... [Extracto inicial del documento]';
+  }
+
+  const selectedIndices = new Set();
+  let currentLen = 0;
+
+  for (const item of matching) {
+    if (currentLen >= maxChars) break;
+    const idxsToAdd = [item.idx - 1, item.idx, item.idx + 1].filter(i => i >= 0 && i < blocks.length);
+    for (const i of idxsToAdd) {
+      if (!selectedIndices.has(i)) {
+        selectedIndices.add(i);
+        currentLen += blocks[i].length;
+        if (currentLen >= maxChars) break;
+      }
+    }
+  }
+
+  const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
+  return sortedIndices.map(i => blocks[i]).join('\n\n') + (currentLen < content.length ? '\n... [Extracto relevante del documento]' : '');
 }
