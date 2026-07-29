@@ -246,9 +246,9 @@ export async function getKnowledgeContext(query = null, history = []) {
       const cleanDocPath = docPathLower.replace(/^portafolio de productos vida\//, "");
       const docContentLower = doc.content.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      // Category groups to ensure general manuals (e.g. Manual GMM) are not penalized when searching sub-products (e.g. Alfa Medical)
-      const gmmProducts = new Set(['alfa medical', 'suma proteccion', 'medicos a tu lado', 'gastos medicos']);
-      const vidaProducts = new Set(['vida mujer', 'imagina ser', 'nuevo plenitud', 'objetivo vida', 'orvi 99', 'segubeca', 'star dotal', 'star temporal']);
+      // Sub-product groups for category hierarchy
+      const gmmSubproducts = new Set(['alfa medical', 'suma proteccion', 'medicos a tu lado']);
+      const vidaSubproducts = new Set(['vida mujer', 'imagina ser', 'nuevo plenitud', 'objetivo vida', 'orvi 99', 'segubeca', 'star dotal', 'star temporal']);
 
       // Determine if this file belongs to a specific product
       let docProductKey = null;
@@ -259,17 +259,24 @@ export async function getKnowledgeContext(query = null, history = []) {
         }
       }
 
-      // Apply product alignment rules with category compatibility
+      // Apply product alignment rules with precise category hierarchy
       if (mentionedProducts.length > 0 && docProductKey) {
-        const isCompatible = mentionedProducts.includes(docProductKey) ||
-          (mentionedProducts.some(m => gmmProducts.has(m)) && gmmProducts.has(docProductKey)) ||
-          (mentionedProducts.some(m => vidaProducts.has(m)) && vidaProducts.has(docProductKey));
+        const isCompatible = mentionedProducts.some(m => {
+          if (m === docProductKey) return true;
+          if (gmmSubproducts.has(m) && docProductKey === 'gastos medicos') return true;
+          if (vidaSubproducts.has(m) && docProductKey === 'vida') return true;
+          return false;
+        });
 
         if (isCompatible) {
           // Strong boost for matching or category-aligned products
           score += 1500;
+          // Priority boost for Product Manuals / Functional Guides
+          if (docPathLower.includes('manual') || docPathLower.includes('funcionamiento') || docPathLower.includes('conoce tu producto') || docPathLower.includes('guia')) {
+            score += 500;
+          }
         } else {
-          // Penalize documents of OTHER product branches (e.g. searching Alfa Medical and matching Vida Mujer)
+          // Penalize documents of OTHER specific sub-products (e.g. searching Orvi and matching Imagina Ser)
           score -= 1000;
         }
       }
@@ -277,7 +284,7 @@ export async function getKnowledgeContext(query = null, history = []) {
       keywords.forEach(kw => {
         // High priority if keyword is in the file title/path (excluding root folder name)
         if (cleanDocPath.includes(kw)) {
-          score += 150;
+          score += 200;
         }
         // Count occurrences in contents
         const regex = new RegExp(kw, 'g');
@@ -292,8 +299,8 @@ export async function getKnowledgeContext(query = null, history = []) {
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score);
 
-    // Get the top 3 matching PDFs to ensure full coverage across general and specific manuals
-    const selectedPdfs = rankedPdfs.slice(0, 3).map(item => item.doc);
+    // Get the top 4 matching PDFs to ensure full coverage across product manuals, conditions and guidelines
+    const selectedPdfs = rankedPdfs.slice(0, 4).map(item => item.doc);
 
     console.log(`🔍 Búsqueda de Contexto para: "${query}"`);
     console.log(`   Palabras clave: [${keywords.join(', ')}]`);
