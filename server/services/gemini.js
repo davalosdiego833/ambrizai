@@ -40,7 +40,7 @@ Instrucciones de interpretación y flexibilidad:
 2. **Contexto y pronombres:** Resuelve de manera inteligente los pronombres en preguntas de seguimiento (como "lo", "eso", "el trámite"). Utiliza el historial de conversación para entender a qué se refiere el usuario (por ejemplo, si acaban de hablar de "beneficio de maternidad" y luego pregunta "¿cómo lo solicito en el sistema?", asume que "lo" es el beneficio de maternidad y "sistema" es el Portal de Asesores donde se gestionan los reembolsos).
 3. **No seas excesivamente literal:** Si un proceso o concepto general está documentado, asocia los términos de la pregunta del usuario con la documentación oficial para responder de forma útil. Solo debes declinar responder si el tema, trámite o proceso solicitado está completamente fuera del conocimiento proporcionado.
 4. **Lectura de la Matriz de Trámites (Tablas):** En el documento PDF de la Matriz de Trámites, la información proviene de tablas y a veces el texto extraído se puede leer de forma continua. Ten extremo cuidado de alinear correctamente los requisitos con su respectivo trámite o subtrámite. No mezcles ni cruces los requisitos de una fila con otra. Por ejemplo: el subtrámite "Anticipo Cristal/Vida Mujer" NO requiere Acta Constitutiva ni poderes de Persona Moral (esos requisitos corresponden a la fila de "Estado de Cuenta" o "Vencimiento de Plan", no al anticipo de dotes de Vida Mujer). Concéntrate en la correspondencia real del trámite.
-5. **No inventar CRM de Ambriz o Portal de Ambriz:** Queda estrictamente prohibido mencionar o sugerir el registro de trámites en un "CRM de la Promotoría Ambriz", "CRM interno" o un "Portal de la Promotoría" para subir folios o darles seguimiento. Los procesos oficiales se completan únicamente en el Portal de Asesores de SMNYL (OV1 y OV2.0) y a través del staff administrativo correspondiente. No supongas la existencia de herramientas de seguimiento interno de la promotoría que no aparezcan de forma explícita en los documentos.
+5. **REGLA OBLIGATORIA DE NOMBRE DEL PORTAL:** Queda ESTRICTAMENTE PROHIBIDO mencionar "Portal de Ambriz", "Portal Ambriz", "CRM de Ambriz", "Plataforma de Ambriz" o "Sistema de la Promotoría" para subir folios, consultar trámites, cotizar o dar seguimiento. NUNCA uses la palabra "Ambriz" para referirte al portal de trámites. Refiérete SIEMPRE como **"Portal de Asesores SMNYL"** (a través de las Oficinas Virtuales OV1 y OV2.0).
 6. **Consistencia de Productos de Vida:** Al responder preguntas sobre productos del ramo de Vida (como Imagina Ser, Nuevo Plenitud, Segubeca, Vida Mujer, Star Dotal, Star Temporal, Objetivo Vida, Orvi 99), asegúrate de usar EXCLUSIVAMENTE los documentos que correspondan a ese producto específico. Bajo ninguna circunstancia cruces o combines reglas, coberturas adicionales (como BIT, BMA, BAM, CPA, etc.) o condiciones de un producto con otro. Si el contexto proporcionado contiene información de un producto diferente al consultado por el asesor, abstente de utilizarla y dile al asesor de forma atenta que no cuentas con la información exacta para ese producto en particular.
 7. **Lectura de Rendimientos (Dólares vs. UDIs):** Cuando leas tablas o reportes de rendimientos históricos o mensuales, ten mucho cuidado de diferenciar correctamente las tasas en **Dólares (USD)** de las tasas en **UDIs**. No mezcles ni cruces los valores de una columna con otra. Al responder al asesor, especifica con absoluta claridad a cuál de las dos monedas corresponde el rendimiento citado (ej. "tasa en UDIs" or "tasa en Dólares") para evitar dar valores equivocados.
 8. **Cuadernos de Concursos (AD y AP):** Los documentos CUADERNO DE CONCURSOS AD y CUADERNO DE CONCURSOS AP se enfocan EXCLUSIVAMENTE en Bonos y Compensación para asesores en desarrollo (primer año) y profesionales (+13 meses). No contienen la lista ni seguimiento de campañas locales. Para consultar avances, seguimiento o bases de campañas vigentes, remite al asesor al Panel de Campañas.
@@ -84,7 +84,7 @@ Instrucciones de interpretación y flexibilidad:
 
 Si el usuario te pregunta sobre algo que no está en el conocimiento provisto o en las plataformas indicadas, responde amablemente indicando que no cuentas con esa información por el momento y sugiriéndole consultar su duda en su grupo de WhatsApp. No inventes respuestas ni intentes adivinar procesos.
 
-CONOCIMIENTO OFICIAL DE LA PROMOTORÍA AMBRIZ:
+CONOCIMIENTO OFICIAL DE SEGUROS MONTERREY NEW YORK LIFE (SMNYL):
 ${knowledgeBase}`;
 
     const geminiHistory = history.map((msg) => ({
@@ -146,7 +146,25 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
   try {
     const knowledgeContext = await getKnowledgeContext(userMessage, history);
     
-    if (query.includes('orvi') || query.includes('orvi 99')) {
+    if (query.includes('extraprima') || query.includes('carta de extraprima')) {
+      responseText = `### Proceso de Carta de Extraprima (SMNYL)
+
+Cuando un trámite de emisión requiere extraprima por evaluación médica o de suscripción:
+
+1. **Notificación de Extraprima:** SMNYL emite la **Carta de Extraprima** en el expediente del trámite dentro del **Portal de Asesores SMNYL**.
+2. **Descarga y Firma:** Ingresa al **Portal de Asesores SMNYL**, descarga el formato de aceptación y recaba la firma autógrafa del contratante/asegurado (idéntica a su INE/Pasaporte).
+3. **Carga en la Oficina Virtual:** Adjunta la carta firmada al folio del trámite en el **Portal de Asesores SMNYL** (sección OV1 u OV2.0).
+4. **Emisión Definitiva:** Al autorizarse la carta y aplicarse el ajuste correspondiente, SMNYL procede con la emisión oficial de la póliza.`;
+    } else if (query.includes('seguimiento') && query.includes('folio')) {
+      responseText = `### Consulta y Seguimiento de Folios (SMNYL)
+
+Para consultar el estatus o dar seguimiento a un folio ingresado:
+
+1. Ingresa al **Portal de Asesores SMNYL** (plataforma oficial de Seguros Monterrey New York Life).
+2. Ve a la sección de **Oficina Virtual (OV1 o OV2.0)**.
+3. Haz clic en **Seguimiento de Trámites / Consulta de Folios**.
+4. Escribe tu **número de folio de 8 dígitos** para verificar el estado de avance, notas del analista de SMNYL o requerimientos pendientes.`;
+    } else if (query.includes('orvi') || query.includes('orvi 99')) {
       responseText = `### Información Oficial: ORVI 99 (SMNYL)
 
 **ORVI 99** es un plan de protección de Vida Entera (hasta los 99 años) con acumulación de ahorro a valor en efectivo:
@@ -238,7 +256,7 @@ Para realizar la emisión de una póliza nueva, sigue este procedimiento oficial
    - Comprobante de Domicilio (no mayor a 3 meses).
    - Formato de PLD / Identificación del Cliente.
    - Constancia de Situación Fiscal (RFC) para facturación.
-4. **Ingreso y Folio:** Registra la solicitud en el Portal de Asesores para obtener el Folio de 8 dígitos de SMNYL.
+4. **Ingreso y Folio:** Registra la solicitud en el **Portal de Asesores SMNYL** para obtener el Folio de 8 dígitos de SMNYL.
 
 **Tiempos estimados de respuesta (SLA):**
 - **Vida Tradicional:** 3 a 5 días hábiles.
@@ -259,13 +277,13 @@ Para realizar la emisión de una póliza nueva, sigue este procedimiento oficial
 3. **Atención de Emergencias 24/7:**
    - Línea Monterrey: **800 505 4000**`;
     } else if (query.includes('folio') || query.includes('subir')) {
-      responseText = `### Registro de Folios en la Promotoría Ambriz
+      responseText = `### Registro de Folios en el Portal de Asesores SMNYL
 
-Para cargar un folio en el sistema de seguimiento de la promotoría:
-1. Accede al Portal de Asesores SMNYL.
-2. Ingresa a **Trámites ➔ Subir Folio**.
+Para cargar un folio en el sistema oficial de SMNYL:
+1. Accede al **Portal de Asesores SMNYL**.
+2. Ingresa a **Trámites ➔ Subir Folio (OV1 o OV2.0)**.
 3. Selecciona el tipo de trámite (Póliza Nueva Vida, GMM, Conservación o Siniestro).
-4. Escribe el número de folio de 8 dígitos.
+4. Escribe el número de folio de 8 dígitos de SMNYL.
 5. Adjunta el archivo PDF completo con la solicitud y expedientes requeridos.`;
     } else if (knowledgeContext && knowledgeContext.length > 500) {
       // Clean and format relevant text from local knowledge files
@@ -278,18 +296,18 @@ Para cargar un folio en el sistema de seguimiento de la promotoría:
       const paragraphs = cleanKnowledge.split('\n\n').filter(p => p.trim().length > 40);
       const excerpt = paragraphs.slice(0, 4).join('\n\n');
 
-      responseText = `### Información Oficial de la Promotoría Ambriz
+      responseText = `### Información Oficial de Seguros Monterrey New York Life (SMNYL)
 
 ${excerpt || cleanKnowledge.slice(0, 1200)}...
 
 *Consulta más detalles o tramita tu solicitud directamente en el **Portal de Asesores SMNYL**.*`;
     } else {
-      responseText = `### Asistente Promotoría Ambriz (SMNYL)
+      responseText = `### Asistente SMNYL (Portal de Asesores)
 
 Puedo ayudarte con información detallada sobre:
 - **Productos de Vida:** Vida Mujer, Imagina Ser, Orvi 99, Nuevo Plenitud, Segubeca, Star Dotal.
 - **Gastos Médicos Mayores (GMM):** Alfa Medical Flex, Pleno, Íntegro, Beneficio de Maternidad.
-- **Procesos Administrativos:** Emisión de pólizas, registro de folios, siniestros y reembolsos.
+- **Procesos Administrativos:** Emisión de pólizas, seguimiento de folios, cartas de extraprima, siniestros y reembolsos.
 - **Concursos y Campañas:** Bases de Convenciones, Graduación y MDRT.
 
 ¿Sobre cuál de estos temas deseas consultar?`;

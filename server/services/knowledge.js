@@ -171,7 +171,8 @@ export async function getKnowledgeContext(query = null, history = []) {
     // Build filtered text context: include general process files, only include campaign files if query is campaign-related
     let context = '';
     for (const doc of baseDocs) {
-      const isCampaignFile = doc.relativePath.toLowerCase().includes('campan') || doc.relativePath.toLowerCase().includes('convencion');
+      const normPath = doc.relativePath.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const isCampaignFile = normPath.includes('campan') || normPath.includes('convencion') || normPath.includes('mdrt') || normPath.includes('graduacion') || normPath.includes('cuaderno');
       if (isCampaignFile && !isCampaignQuery) {
         // Skip campaign text files for product / process queries
         continue;
@@ -254,9 +255,14 @@ export async function getKnowledgeContext(query = null, history = []) {
     const rankedPdfs = pdfDocs.map(doc => {
       let score = 0;
       const docPathLower = doc.relativePath.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      // Remove root folder name to prevent matching the word "vida" from "PORTAFOLIO DE PRODUCTOS VIDA" on every single file path
       const cleanDocPath = docPathLower.replace(/^portafolio de productos vida\//, "");
       const docContentLower = doc.content.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // Strictly penalize Campaign / Cuaderno de Concursos PDFs if the query is NOT about campaigns
+      const isCampaignPdf = docPathLower.includes('campan') || docPathLower.includes('convencion') || docPathLower.includes('mdrt') || docPathLower.includes('graduacion') || docPathLower.includes('cuaderno');
+      if (isCampaignPdf && !isCampaignQuery) {
+        score -= 5000;
+      }
 
       // Sub-product groups for category hierarchy
       const gmmSubproducts = new Set(['alfa medical', 'suma proteccion', 'medicos a tu lado']);
