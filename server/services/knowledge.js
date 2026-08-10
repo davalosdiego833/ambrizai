@@ -310,7 +310,7 @@ export async function getKnowledgeContext(query = null, history = []) {
     console.log(`   PDFs seleccionados: ${selectedPdfs.map(d => d.relativePath).join(', ') || 'Ninguno'}`);
 
     for (const doc of selectedPdfs) {
-      const docContent = extractRelevantContent(doc.content, keywords, 30000);
+      const docContent = extractRelevantContent(doc.content, keywords, 6000);
       context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${docContent}\n=== FIN DE DOCUMENTO ===\n`;
     }
 
@@ -321,7 +321,7 @@ export async function getKnowledgeContext(query = null, history = []) {
   }
 }
 
-function extractRelevantContent(content, keywords, maxChars = 30000) {
+function extractRelevantContent(content, keywords, maxChars = 6000) {
   if (!content || content.length <= maxChars) return content;
   
   const paragraphs = content.split(/(?:\r?\n){2,}/);

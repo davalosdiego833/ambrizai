@@ -42,20 +42,21 @@ export default function useChat(user) {
     fetchFolders();
   }, [fetchFolders]);
 
+  const skipFetchForChatRef = useRef(null);
+
   // Fetch messages when activeChatId changes
   useEffect(() => {
-    if (activeChatId && activeChatId === justCreatedChatRef.current) {
-      // Avoid fetching for a brand-new chat we just created,
-      // as it will be populated by the sending action
-      justCreatedChatRef.current = null;
+    if (!activeChatId) {
+      setMessages([]);
+      return;
+    }
+
+    if (activeChatId === skipFetchForChatRef.current) {
+      // Avoid overwriting local messages while streaming or just created
       return;
     }
 
     const fetchMessages = async () => {
-      if (!activeChatId) {
-        setMessages([]);
-        return;
-      }
       setLoading(true);
       try {
         const msgList = await api.getChatMessages(activeChatId);
@@ -71,14 +72,15 @@ export default function useChat(user) {
   }, [activeChatId]);
 
   const selectChat = (chatId) => {
+    skipFetchForChatRef.current = null;
     setActiveChatId(chatId);
   };
 
   const createNewChat = async (title = 'Nuevo chat') => {
     try {
       const newChat = await api.createChat(title);
+      skipFetchForChatRef.current = newChat.id;
       setChats((prev) => [newChat, ...prev]);
-      justCreatedChatRef.current = newChat.id;
       setActiveChatId(newChat.id);
       return newChat;
     } catch (err) {
@@ -134,6 +136,7 @@ export default function useChat(user) {
       setMessages((prev) => [...prev, botMsg]);
 
       // 4. Send message and read stream
+      skipFetchForChatRef.current = currentChatId;
       let streamedText = '';
       await api.sendMessageStream(
         currentChatId,
@@ -182,6 +185,7 @@ export default function useChat(user) {
   };
 
   const handleNewChat = () => {
+    skipFetchForChatRef.current = null;
     setActiveChatId(null);
     setMessages([]);
   };

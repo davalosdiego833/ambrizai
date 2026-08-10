@@ -337,6 +337,9 @@ router.post('/message', (req, res) => {
     res.flushHeaders();
   }
 
+  // Write immediate initial ping to establish connection with mobile/browser socket instantly
+  res.write(': ping\n\n');
+
   let botMessageContent = '';
   
   // Callback when a chunk arrives
