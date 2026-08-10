@@ -146,7 +146,70 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
   try {
     const knowledgeContext = await getKnowledgeContext(userMessage, history);
     
-    if (query.includes('vida mujer') || query.includes('mujer')) {
+    if (query.includes('orvi') || query.includes('orvi 99')) {
+      responseText = `### Información Oficial: ORVI 99 (SMNYL)
+
+**ORVI 99** es un plan de protección de Vida Entera (hasta los 99 años) con acumulación de ahorro a valor en efectivo:
+
+1. **Características del Producto:**
+   - **Plazos de Pago:** Pago Limitado a 5, 10, 15, 20 años o Pagos Vitalicios (hasta los 99 años).
+   - **Moneda:** Pesos o UDIs.
+   - **Edad de Contratación:** De 0 a 70 años.
+   - **Suma Asegurada Mínima:** $500,000 MXN o 50,000 UDIs.
+
+2. **Opción Mancomunada:**
+   - Permite asegurar a dos cónyuges (matrimonio) bajo la misma póliza compartiendo la suma asegurada por fallecimiento e invalidez. SÍ es requisito que los contratantes sean cónyuges.
+
+3. **Coberturas Adicionales Disponible:**
+   - **BIT:** Exención de Pago de Primas por Invalidez Total y Permanente.
+   - **BMA / DI:** Beneficio de Muerte Accidental y Doble Indemnización.
+   - **Valores Garantizados:** Préstamo sobre la póliza y rescate de valor en efectivo.`;
+    } else if (query.includes('imagina ser') || query.includes('imagina')) {
+      responseText = `### Información Oficial: Imagina Ser ® (SMNYL)
+
+**Imagina Ser** es un plan de retiro con protección de vida y deducción fiscal:
+
+1. **Beneficios Principales:**
+   - **Edad de Retiro:** Elegible a los 55, 60, 65 o 70 años.
+   - **Deducibilidad Fiscal:** Compatible con los artículos 151 (PPR) y 185 del LISR.
+   - **Forma de Entrega de Ahorro:** En una sola exhibición o en renta vitalicia mensual heredable.
+2. **Moneda:** Pesos o UDIs.`;
+    } else if (query.includes('segubeca') || query.includes('beca')) {
+      responseText = `### Información Oficial: Segubeca ® (SMNYL)
+
+**Segubeca** es el plan de ahorro educativo garantizado para la universidad de los hijos:
+
+1. **Funcionamiento:**
+   - **Edad de Entrega:** Al cumplir el hijo los 18 años.
+   - **Período de Entrega:** En 1 sola exhibición o en 4 mensualidades anuales durante la carrera.
+   - **Garantía Educativa:** Si el padre/tutor fallece o sufre invalidez, la póliza queda pagada automáticamente y al cumplir 18 años el hijo recibe el ahorro contratado.`;
+    } else if (query.includes('convencion') || query.includes('convenciones') || query.includes('diamante') || query.includes('los cabos') || query.includes('vancouver') || query.includes('estambul') || query.includes('japon')) {
+      responseText = `### Convenciones Asesores LP 2027 (SMNYL)
+
+**Destinos Oficiales por Nivel de Diamante:**
+- **Un Diamante (1 Diamante):** Los Cabos
+- **Dos Diamantes (2 Diamantes):** Vancouver
+- **Tres Diamantes (3 Diamantes):** Estambul
+- **Gran Diamante:** Japón
+
+*Para consultar tu avance de comisiones y lugares individuales, ingresa al **Panel de Campañas de la Promotoría Ambriz** ([panel.ambrizydavalos.com](https://panel.ambrizydavalos.com)).*`;
+    } else if (query.includes('mdrt') || query.includes('orlando')) {
+      responseText = `### Campaña MDRT 2027 (Orlando, Florida)
+
+**Metas Oficiales por Método de Producción:**
+- **Miembro MDRT:** Comisión $905,200 | Ingresos $1,567,800 | Prima Anualizada $1,810,400.
+- **Court of the Table (COT):** Comisión $2,715,600 | Ingresos $4,703,400 | Prima Anualizada $5,431,200.
+- **Top of the Table (TOT):** Comisión $5,431,200 | Ingresos $9,406,800 | Prima Anualizada $10,862,400.
+- **Aspirantes Primerizas (Uso Único):** Aspirante 1 ($905,200 en Primas) y Aspirante 2 ($1,357,800 en Primas).`;
+    } else if (query.includes('graduacion') || query.includes('graduación')) {
+      responseText = `### Campaña de Graduación (Asesores en Desarrollo)
+
+1. **Requisitos de Pólizas Acumuladas (Meses 1 a 12):**
+   - **Graduación Normal:** 36 pólizas acumuladas.
+   - **Graduación con Honores:** 48 pólizas acumuladas.
+2. **Regla de Continuidad ("No 0 Puntos"):** Emitir al menos 1 punto de póliza en cada mes subsecuente hasta el mes de corte.
+3. **Frecuencia:** Oportunidad única en la vida del asesor (primer año).`;
+    } else if (query.includes('vida mujer') || query.includes('mujer')) {
       responseText = `### Información Oficial: Vida Mujer ® (SMNYL)
 
 **Vida Mujer** es un plan de protección y ahorro garantizado diseñado especialmente para la mujer:

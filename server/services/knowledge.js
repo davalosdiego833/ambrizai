@@ -150,25 +150,35 @@ export async function getKnowledgeContext(query = null, history = []) {
     const baseDocs = cachedDocs.filter(doc => doc.ext === '.txt' || doc.ext === '.md');
     const pdfDocs = cachedDocs.filter(doc => doc.ext === '.pdf');
 
-    // Build baseline context (always included)
-    let context = '';
-    for (const doc of baseDocs) {
-      context += `\n\n=== DOCUMENTO: ${doc.relativePath} ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
-    }
-
-    // If no query is provided, return all documents (fallback)
+    // If no query is provided, return baseline process documents
     if (!query) {
+      let context = '';
+      for (const doc of baseDocs) {
+        context += `\n\n=== DOCUMENTO: ${doc.relativePath} ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
+      }
       for (const doc of pdfDocs) {
         context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
       }
       return context;
     }
 
-    // Normalize and extract keywords from the user query
     const cleanQuery = query.toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
-      .replace(/[^a-z0-9\s]/g, " "); // remove special characters
-    
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s]/g, " ");
+
+    const isCampaignQuery = ['campana', 'campanas', 'campaña', 'campañas', 'convencion', 'convenciones', 'graduacion', 'graduación', 'mdrt', 'concurso', 'concursos', 'bono', 'bonos', 'diamante'].some(k => cleanQuery.includes(k));
+
+    // Build filtered text context: include general process files, only include campaign files if query is campaign-related
+    let context = '';
+    for (const doc of baseDocs) {
+      const isCampaignFile = doc.relativePath.toLowerCase().includes('campan') || doc.relativePath.toLowerCase().includes('convencion');
+      if (isCampaignFile && !isCampaignQuery) {
+        // Skip campaign text files for product / process queries
+        continue;
+      }
+      context += `\n\n=== DOCUMENTO: ${doc.relativePath} ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
+    }
+
     // Detect mentioned products in query to prioritize their folders
     const PRODUCTS = [
       { key: 'campanas', keywords: ['campana', 'campanas', 'campaña', 'campañas', 'graduacion', 'graduación', 'mdrt', 'aspirante 1', 'aspirante 2', 'aspirante', 'cumbre', 'legion centurion', 'legión centurión', 'rda', 'convenciones'] },
