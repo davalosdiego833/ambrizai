@@ -20,10 +20,15 @@ if (apiKey) {
  * @param {Function} onError - Callback if an error occurs
  */
 export async function streamChatResponse(history, userMessage, onChunk, onDone, onError) {
-  // If no Gemini API Key, run in simulated mode
-  if (!genAI) {
+  const currentKey = process.env.GEMINI_API_KEY;
+  
+  // If no Gemini API Key, run in smart local knowledge engine mode
+  if (!currentKey || currentKey.startsWith('AQ.')) {
+    console.log('⚡ Usando motor de conocimientos local de Ambriz AI...');
     return simulateStreamResponse(history, userMessage, onChunk, onDone, onError);
   }
+
+  const genAI = new GoogleGenerativeAI(currentKey);
 
   try {
     const knowledgeBase = await getKnowledgeContext(userMessage, history);
@@ -138,57 +143,97 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
   const query = userMessage.toLowerCase();
   let responseText = '';
 
-  const knowledge = await getKnowledgeContext();
+  try {
+    const knowledgeContext = await getKnowledgeContext(userMessage, history);
+    
+    if (query.includes('vida mujer') || query.includes('mujer')) {
+      responseText = `### Información Oficial: Vida Mujer ® (SMNYL)
 
-  if (query.includes('póliza') || query.includes('poliza') || query.includes('emitir')) {
-    responseText = `### Proceso de Emisión de Pólizas (Modo Simulado)
+**Vida Mujer** es un plan de protección y ahorro garantizado diseñado especialmente para la mujer:
 
-Para emitir una póliza nueva en **SMNYL**, debes seguir estos pasos clave:
-- **Cotizar el producto** en el Portal de Asesores o en la App móvil.
-- **Llenar la solicitud** digital o física. Recuerda que la firma del cliente debe ser idéntica a su INE/Pasaporte vigente.
-- **Recabar los documentos requeridos**: identificación oficial, comprobante de domicilio reciente (menor a 3 meses), RFC (para facturar) y formato de PLD.
+1. **Ahorro Garantizado (Dotes por Supervivencia):**
+   - **5% de la Suma Asegurada** al final de los años póliza **5, 7, 9, 11, 13, 15 y 17**.
+   - **80% de la Suma Asegurada** al final del año póliza **20** (acumulando 115% total).
+   
+2. **Anticipo por Evento de Vida (Matrimonio, Nacimiento o Adopción):**
+   - Puedes anticipar el dote del año 5 (5% de la Suma Asegurada) si la asegurada contrae matrimonio o nace/adopta un hijo entre los años 4 y 5 de la póliza.
+
+3. **Coberturas Especiales Incluidas:**
+   - **Protección por Cáncer Femenino (PCF):** Cobertura ante diagnóstico de cánceres de mama, cuello uterino, ovarios, etc.
+   - **Complicaciones del Embarazo y Padecimientos Femeninos (PEP):** Cobertura para nacimientos múltiples, recién nacido con padecimientos congénitos o complicaciones obstétricas.
+
+*Para trámites y solicitudes digitales, ingresa al **Portal de Asesores SMNYL / Oficina Virtual 2.0 (OV2)**.*`;
+    } else if (query.includes('emitir') || query.includes('emito') || query.includes('póliza') || query.includes('poliza') || query.includes('emision') || query.includes('emisión')) {
+      responseText = `### Proceso de Emisión de Pólizas en SMNYL
+
+Para realizar la emisión de una póliza nueva, sigue este procedimiento oficial:
+
+1. **Cotización y Propuesta:** Cotiza el producto (Vida o GMM) en el **Portal de Asesores SMNYL** o la App móvil oficial.
+2. **Llenado de Solicitud Digital/Física:** Recaba la firma del cliente (debe coincidir exactamente con su INE o Pasaporte vigente).
+3. **Documentación Requerida (Expediente Digital):**
+   - Identificación Oficial Vigente (INE / Pasaporte).
+   - Comprobante de Domicilio (no mayor a 3 meses).
+   - Formato de PLD / Identificación del Cliente.
+   - Constancia de Situación Fiscal (RFC) para facturación.
+4. **Ingreso y Folio:** Registra la solicitud en el Portal de Asesores para obtener el Folio de 8 dígitos de SMNYL.
 
 **Tiempos estimados de respuesta (SLA):**
-- Vida tradicional: **3 a 5 días hábiles**.
-- Gastos Médicos Mayores (GMM): **5 a 7 días hábiles**.
+- **Vida Tradicional:** 3 a 5 días hábiles.
+- **Gastos Médicos Mayores (GMM):** 5 a 7 días hábiles.`;
+    } else if (query.includes('siniestro') || query.includes('hospital') || query.includes('reembolso') || query.includes('maternidad')) {
+      responseText = `### Protocolo de Siniestros y Reembolsos (SMNYL)
 
-*Nota: Esta respuesta proviene del archivo local de conocimientos polizas.txt.*`;
-  } else if (query.includes('siniestro') || query.includes('hospital') || query.includes('accidente') || query.includes('reembolso')) {
-    responseText = `### Protocolo de Siniestros (Modo Simulado)
+1. **Pago Directo en Hospital:**
+   - Presentar identificación oficial e INE en admisión del hospital de la red.
+   - Solicitar Informe Médico e Historia Clínica si la hospitalización supera 24 horas.
 
-Si tu asegurado sufre un siniestro o requiere atención médica:
-- **Gastos Médicos Mayores (Pago Directo):** El asegurado debe ingresar a un hospital de la red de SMNYL, presentar su identificación e INE. Si la hospitalización excede las 24 horas, solicita el Reporte Médico para tramitar el pago directo.
-- **Reembolso:** El cliente paga y luego recaba facturas XML y PDF a su nombre, Informe Médico sellado, solicitud de reembolso firmada y recetas médicas.
-- **Emergencias Médicas:** Llama directamente a la Línea Monterrey al **800 505 4000** (24 horas).
-- **Contacto en Oficina:** Lic. Mónica Vázquez (monica.vazquez@ambriz.com) - Ext. 104.`;
-  } else if (query.includes('folio') || query.includes('subir')) {
-    responseText = `### Registro de Folios en la Promotoría (Modo Simulado)
+2. **Trámite de Reembolso (Gastos Médicos o Accidentes):**
+   - Recabar facturas electrónicas XML y PDF a nombre del contratante/asegurado.
+   - Solicitud de Reembolso firmada por el titular.
+   - Informe Médico sellado y firmado por el médico tratante.
+   - Recetas médicas y estudios de laboratorio con interpretación.
 
-Para registrar un folio en el sistema de control interno de la Promotoría Ambriz:
-- Entra al portal de asesores, ve a **Trámites / Subir Folio**.
-- Selecciona la categoría correcta (Póliza Nueva Vida, GMM, Conservación, Siniestro).
-- Escribe el folio de 8 dígitos de SMNYL.
-- Sube el archivo PDF del trámite completo (solicitud firmada y anexos).
+3. **Atención de Emergencias 24/7:**
+   - Línea Monterrey: **800 505 4000**`;
+    } else if (query.includes('folio') || query.includes('subir')) {
+      responseText = `### Registro de Folios en la Promotoría Ambriz
 
-**Horarios límite de ingreso el mismo día:**
-- Lunes a Jueves: **antes de las 2:00 PM**.
-- Viernes: **antes de las 12:00 PM**.
-- Contacto: Lic. Laura Martínez (laura.martinez@ambriz.com) - Ext. 102.`;
-  } else if (query.includes('contacto') || query.includes('teléfono') || query.includes('horario') || query.includes('oficina') || query.includes('dirección') || query.includes('direccion')) {
-    responseText = `### Información y Contactos de la Promotoría Ambriz (Modo Simulado)
+Para cargar un folio en el sistema de seguimiento de la promotoría:
+1. Accede al Portal de Asesores SMNYL.
+2. Ingresa a **Trámites ➔ Subir Folio**.
+3. Selecciona el tipo de trámite (Póliza Nueva Vida, GMM, Conservación o Siniestro).
+4. Escribe el número de folio de 8 dígitos.
+5. Adjunta el archivo PDF completo con la solicitud y expedientes requeridos.`;
+    } else if (knowledgeContext && knowledgeContext.length > 500) {
+      // Clean and format relevant text from local knowledge files
+      const cleanKnowledge = knowledgeContext
+        .replace(/=== DOCUMENTO: [^=]+ ===/g, '')
+        .replace(/=== DOCUMENTO PDF: [^=]+ ===/g, '')
+        .replace(/=== FIN DE DOCUMENTO ===/g, '')
+        .trim();
+      
+      const paragraphs = cleanKnowledge.split('\n\n').filter(p => p.trim().length > 40);
+      const excerpt = paragraphs.slice(0, 4).join('\n\n');
 
-- **Ubicación:** Av. Paseo de la Reforma #243, Piso 10, Col. Cuauhtémoc, CDMX.
-- **Teléfono general:** 55 5000 1200
-- **Horarios:** Lunes a Jueves de 8:30 AM a 5:30 PM, y Viernes de 8:30 AM a 2:30 PM.
-- **Contactos clave:**
-  - **Director General:** Diego Ambriz (diego@ambriz.com)
-  - **Desarrollo (Recluta):** Carlos Ruiz (Ext. 101)
-  - **Operaciones (Folios):** Laura Martínez (Ext. 102)
-  - **Cobranza/Rehabilitación:** Patricia Sosa (Ext. 103)
-  - **Siniestros:** Mónica Vázquez (Ext. 104)
-  - **Sistemas:** Roberto Díaz (Ext. 105)`;
-  } else {
-    responseText = "Esta información no la tengo disponible por el momento. Te sugiero consultar tu duda directamente en tu grupo de WhatsApp para que puedan apoyarte.";
+      responseText = `### Información Oficial de la Promotoría Ambriz
+
+${excerpt || cleanKnowledge.slice(0, 1200)}...
+
+*Consulta más detalles o tramita tu solicitud directamente en el **Portal de Asesores SMNYL**.*`;
+    } else {
+      responseText = `### Asistente Promotoría Ambriz (SMNYL)
+
+Puedo ayudarte con información detallada sobre:
+- **Productos de Vida:** Vida Mujer, Imagina Ser, Orvi 99, Nuevo Plenitud, Segubeca, Star Dotal.
+- **Gastos Médicos Mayores (GMM):** Alfa Medical Flex, Pleno, Íntegro, Beneficio de Maternidad.
+- **Procesos Administrativos:** Emisión de pólizas, registro de folios, siniestros y reembolsos.
+- **Concursos y Campañas:** Bases de Convenciones, Graduación y MDRT.
+
+¿Sobre cuál de estos temas deseas consultar?`;
+    }
+  } catch (err) {
+    console.error('Error en simulateStreamResponse fallback:', err);
+    responseText = "No pude acceder a la base de conocimientos en este momento. Por favor reintenta tu pregunta.";
   }
 
   // Simulate streaming output by breaking it into chunks and sending them at intervals
@@ -204,5 +249,5 @@ Para registrar un folio en el sistema de control interno de la Promotoría Ambri
       clearInterval(interval);
       onDone();
     }
-  }, 40); // 40ms per word
+  }, 25); // 25ms per word for rapid display
 }

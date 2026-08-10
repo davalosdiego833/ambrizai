@@ -224,9 +224,11 @@ export async function getKnowledgeContext(query = null, history = []) {
     }
 
     const stopWords = new Set([
-      "como", "hago", "un", "de", "en", "una", "y", "el", "la", "los", "las", 
-      "para", "con", "del", "por", "que", "cual", "cuales", "son", "se", "mi", 
-      "mis", "su", "sus", "hacer", "puedo", "donde", "quien", "si", "no", "o", "a", "al"
+      "como", "cómo", "hago", "un", "de", "en", "una", "y", "el", "la", "los", "las", 
+      "para", "con", "del", "por", "que", "qué", "cual", "cuál", "cuales", "cuáles", "son", "se", "mi", 
+      "mis", "su", "sus", "hacer", "puedo", "donde", "dónde", "quien", "quién", "si", "no", "o", "a", "al",
+      "dame", "dime", "informacion", "información", "sobre", "acerca", "quiero", "saber", "favor", "porfa", "fa",
+      "hola", "buenos", "dias", "tardes", "noches", "ayuda", "ayudame", "necesito"
     ]);
 
     const keywords = cleanQuery.split(/\s+/)
@@ -234,7 +236,7 @@ export async function getKnowledgeContext(query = null, history = []) {
       .filter(w => w.length > 2 && !stopWords.has(w));
 
     if (keywords.length === 0) {
-      // If no valid keywords, return only base text documents
+      // If no valid keywords, return base text documents
       return context;
     }
 
@@ -310,7 +312,7 @@ export async function getKnowledgeContext(query = null, history = []) {
     console.log(`   PDFs seleccionados: ${selectedPdfs.map(d => d.relativePath).join(', ') || 'Ninguno'}`);
 
     for (const doc of selectedPdfs) {
-      const docContent = extractRelevantContent(doc.content, keywords, 6000);
+      const docContent = extractRelevantContent(doc.content, keywords, 12000);
       context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${docContent}\n=== FIN DE DOCUMENTO ===\n`;
     }
 
@@ -321,7 +323,7 @@ export async function getKnowledgeContext(query = null, history = []) {
   }
 }
 
-function extractRelevantContent(content, keywords, maxChars = 6000) {
+function extractRelevantContent(content, keywords, maxChars = 12000) {
   if (!content || content.length <= maxChars) return content;
   
   const paragraphs = content.split(/(?:\r?\n){2,}/);
@@ -330,9 +332,15 @@ function extractRelevantContent(content, keywords, maxChars = 6000) {
   const scored = blocks.map((block, idx) => {
     let score = 0;
     const blockLower = block.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    // Penalize table of contents / index blocks
+    if (blockLower.includes("tabla de contenido") || blockLower.includes("indice") || blockLower.includes("cómo usar esta guia") || blockLower.includes("introduccion")) {
+      score -= 15;
+    }
+
     keywords.forEach(kw => {
       if (kw && blockLower.includes(kw)) {
-        score += 10;
+        score += 15;
       }
     });
     return { idx, block, score };
