@@ -108,6 +108,23 @@ export default function useChat(user) {
     let currentChatId = activeChatId;
     setSending(true);
 
+    const botMsgId = `bot-${Date.now()}`;
+    const userMsg = {
+      id: `user-${Date.now()}`,
+      sender: 'user',
+      text,
+      timestamp: new Date().toISOString(),
+    };
+    const botMsg = {
+      id: botMsgId,
+      sender: 'bot',
+      text: '',
+      timestamp: new Date().toISOString(),
+    };
+
+    // Add user message & bot typing indicator to UI INSTANTLY
+    setMessages((prev) => [...prev, userMsg, botMsg]);
+
     try {
       // 1. If no active chat, create one first
       if (!currentChatId) {
@@ -116,27 +133,9 @@ export default function useChat(user) {
         currentChatId = newChat.id;
       }
 
-      // 2. Add user message locally
-      const userMsg = {
-        id: `user-${Date.now()}`,
-        sender: 'user',
-        text,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, userMsg]);
-
-      // 3. Add initial empty bot message for streaming
-      const botMsgId = `bot-${Date.now()}`;
-      const botMsg = {
-        id: botMsgId,
-        sender: 'bot',
-        text: '',
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, botMsg]);
-
-      // 4. Send message and read stream
       skipFetchForChatRef.current = currentChatId;
+
+      // 2. Send message and read stream
       let streamedText = '';
       await api.sendMessageStream(
         currentChatId,
@@ -152,7 +151,7 @@ export default function useChat(user) {
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === botMsgId
-                ? { ...msg, text: 'Lo siento, hubo un error al obtener la respuesta. Por favor intenta de nuevo.' }
+                ? { ...msg, text: err.message || 'Lo siento, hubo un error al obtener la respuesta. Por favor intenta de nuevo.' }
                 : msg
             )
           );
@@ -175,8 +174,8 @@ export default function useChat(user) {
       console.error('Error in sendMessage:', err);
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.sender === 'bot' && !msg.text.trim()
-            ? { ...msg, text: 'Ocurrió un error al enviar el mensaje. Verifica tu conexión.' }
+          msg.id === botMsgId
+            ? { ...msg, text: err.message || 'Ocurrió un error al enviar el mensaje. Verifica tu conexión.' }
             : msg
         )
       );

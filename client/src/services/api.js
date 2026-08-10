@@ -9,6 +9,16 @@ const getHeaders = () => {
   };
 };
 
+const checkAuthResponse = (res) => {
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.reload();
+    throw new Error('Sesión expirada. Redirigiendo a inicio de sesión...');
+  }
+  return res;
+};
+
 export const api = {
   async login(email, password) {
     const res = await fetch(`${API_URL}/auth/login`, {
@@ -33,6 +43,7 @@ export const api = {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    window.location.reload();
   },
 
   getCurrentUser() {
@@ -45,6 +56,7 @@ export const api = {
     const res = await fetch(url, {
       headers: getHeaders(),
     });
+    checkAuthResponse(res);
     if (!res.ok) throw new Error('Error al obtener chats');
     return res.json();
   },
@@ -55,6 +67,7 @@ export const api = {
       headers: getHeaders(),
       body: JSON.stringify({ title }),
     });
+    checkAuthResponse(res);
     if (!res.ok) throw new Error('Error al crear chat');
     return res.json();
   },
@@ -64,6 +77,7 @@ export const api = {
       method: 'DELETE',
       headers: getHeaders(),
     });
+    checkAuthResponse(res);
     if (!res.ok) throw new Error('Error al eliminar chat');
     return res.json();
   },
@@ -72,6 +86,7 @@ export const api = {
     const res = await fetch(`${API_URL}/chat/${chatId}/messages`, {
       headers: getHeaders(),
     });
+    checkAuthResponse(res);
     if (!res.ok) throw new Error('Error al obtener mensajes');
     return res.json();
   },
@@ -88,6 +103,8 @@ export const api = {
         },
         body: JSON.stringify({ chatId, text }),
       });
+
+      checkAuthResponse(res);
 
       if (!res.ok) {
         let errorMsg = 'Error al enviar mensaje';
