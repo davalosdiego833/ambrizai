@@ -39,7 +39,6 @@ export default function ChatInput({ onSendMessage, disabled }) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={disabled}
             rows={1}
           />
           <button

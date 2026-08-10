@@ -328,9 +328,14 @@ router.post('/message', (req, res) => {
   writeChatsDB(db);
 
   // 2. Set headers for Server-Sent Events (SSE)
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Disable Nginx proxy buffering for mobile
+  res.setHeader('Content-Encoding', 'none');
+  if (typeof res.flushHeaders === 'function') {
+    res.flushHeaders();
+  }
 
   let botMessageContent = '';
   
@@ -368,7 +373,8 @@ router.post('/message', (req, res) => {
 
   // Callback on stream error
   const onError = (err) => {
-    res.write(`data: ${JSON.stringify({ error: err.message || 'Error en streaming' })}\n\n`);
+    console.error('Error durante streaming de chat:', err);
+    res.write(`data: ${JSON.stringify({ error: err?.message || 'Error al procesar respuesta' })}\n\n`);
     res.end();
   };
 

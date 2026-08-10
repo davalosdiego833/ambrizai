@@ -76,7 +76,7 @@ export const api = {
     return res.json();
   },
 
-  // Streaming message request
+  // Streaming message request with mobile resilience
   async sendMessageStream(chatId, text, onChunk, onError, onDone) {
     try {
       const token = localStorage.getItem('token');
@@ -90,13 +90,37 @@ export const api = {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Error al enviar mensaje');
+        let errorMsg = 'Error al enviar mensaje';
+        try {
+          const errData = await res.json();
+          errorMsg = errData.message || errorMsg;
+        } catch (e) {}
+        throw new Error(errorMsg);
+      }
+
+      if (!res.body || !res.body.getReader) {
+        // Fallback for browsers/WebViews without ReadableStream support
+        const fullText = await res.text();
+        const lines = fullText.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('data: ')) {
+            const dataStr = trimmed.slice(6);
+            if (dataStr === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.text) onChunk(parsed.text);
+            } catch (e) {}
+          }
+        }
+        onDone();
+        return;
       }
 
       const reader = res.body.getReader();
-      const decoder = new TextDecoder();
+      const decoder = new TextDecoder('utf-8');
       let buffer = '';
+      let hasReceivedChunks = false;
 
       while (true) {
         const { value, done } = await reader.read();
@@ -107,7 +131,6 @@ export const api = {
 
         // Process SSE format: "data: {...}\n\n"
         const lines = buffer.split('\n');
-        // Keep the last partial line in buffer
         buffer = lines.pop() || '';
 
         for (const line of lines) {
@@ -126,6 +149,7 @@ export const api = {
                 return;
               }
               if (parsed.text) {
+                hasReceivedChunks = true;
                 onChunk(parsed.text);
               }
             } catch (e) {
@@ -135,9 +159,12 @@ export const api = {
         }
       }
 
-      // Check if there is remaining content
-      if (buffer.startsWith('data: ')) {
-        const dataStr = buffer.slice(6).trim();
+      // Flush decoder remaining bytes
+      buffer += decoder.decode();
+
+      // Check if there is remaining content in buffer
+      if (buffer.trim().startsWith('data: ')) {
+        const dataStr = buffer.trim().slice(6);
         if (dataStr !== '[DONE]') {
           try {
             const parsed = JSON.parse(dataStr);
@@ -145,13 +172,17 @@ export const api = {
               onError(new Error(parsed.error));
               return;
             }
-            if (parsed.text) onChunk(parsed.text);
+            if (parsed.text) {
+              hasReceivedChunks = true;
+              onChunk(parsed.text);
+            }
           } catch (e) {}
         }
       }
       
       onDone();
     } catch (err) {
+      console.error('API sendMessageStream error:', err);
       onError(err);
     }
   },

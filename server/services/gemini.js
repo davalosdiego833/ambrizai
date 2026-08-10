@@ -82,16 +82,23 @@ Si el usuario te pregunta sobre algo que no está en el conocimiento provisto o 
 CONOCIMIENTO OFICIAL DE LA PROMOTORÍA AMBRIZ:
 ${knowledgeBase}`;
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      systemInstruction: systemPrompt,
-    });
-
-    // Format history for Gemini API: [{ role: 'user'|'model', parts: [{ text: string }] }]
     const geminiHistory = history.map((msg) => ({
       role: msg.sender === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }],
     }));
+
+    let model;
+    try {
+      model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        systemInstruction: systemPrompt,
+      });
+    } catch (e) {
+      model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: systemPrompt,
+      });
+    }
 
     const chat = model.startChat({
       history: geminiHistory,
@@ -102,17 +109,28 @@ ${knowledgeBase}`;
 
     const result = await chat.sendMessageStream(userMessage);
 
+    let receivedAnyChunk = false;
     for await (const chunk of result.stream) {
       const text = chunk.text();
       if (text) {
+        receivedAnyChunk = true;
         onChunk(text);
       }
     }
 
+    if (!receivedAnyChunk) {
+      // Fallback in case stream returned 0 chunks
+      onChunk("Disculpa, no pude procesar la respuesta en este momento. Por favor intenta formular tu pregunta de nuevo.");
+    }
+
     onDone();
   } catch (err) {
-    console.error('Error en streamChatResponse:', err);
-    onError(err);
+    console.error('Error en streamChatResponse (usando fallback simulado):', err);
+    try {
+      return await simulateStreamResponse(history, userMessage, onChunk, onDone, onError);
+    } catch (fallbackErr) {
+      onError(fallbackErr || err);
+    }
   }
 }
 

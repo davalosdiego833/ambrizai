@@ -144,10 +144,18 @@ export default function MessageBubble({ message }) {
       
       <div className="message-content">
         <div className="message-text-wrapper">
-          {formatText(text)}
+          {isBot && (!text || !text.trim()) ? (
+            <div className="typing-indicator" style={{ padding: '6px 0', margin: 0 }}>
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+            </div>
+          ) : (
+            formatText(text)
+          )}
         </div>
         
-        {isBot && text && (
+        {isBot && text && text.trim() && (
           <div className="message-actions">
             <button className="action-btn" onClick={handleCopy} title="Copiar respuesta">
               {copied ? (

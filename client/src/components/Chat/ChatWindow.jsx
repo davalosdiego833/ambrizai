@@ -16,13 +16,10 @@ export default function ChatWindow({ messages, isLoading, onQuickAction }) {
       {messages.length === 0 ? (
         <WelcomeScreen onQuickAction={onQuickAction} />
       ) : (
-        messages.map((msg) => {
-          if (msg.sender === 'bot' && !msg.text) return null;
-          return <MessageBubble key={msg.id} message={msg} />;
-        })
+        messages.map((msg) => (
+          <MessageBubble key={msg.id} message={msg} />
+        ))
       )}
-      
-      {isLoading && <TypingIndicator />}
       
       <div ref={bottomRef} style={{ height: 1 }} />
     </div>

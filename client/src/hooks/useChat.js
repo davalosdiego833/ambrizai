@@ -157,12 +157,26 @@ export default function useChat(user) {
         },
         () => {
           setSending(false);
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === botMsgId && !msg.text.trim()
+                ? { ...msg, text: 'Disculpa, no pude obtener una respuesta completa. Por favor intenta de nuevo.' }
+                : msg
+            )
+          );
           // Refresh chat list to update titles if it was a new chat
           fetchChats(searchQuery);
         }
       );
     } catch (err) {
       console.error('Error in sendMessage:', err);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.sender === 'bot' && !msg.text.trim()
+            ? { ...msg, text: 'Ocurrió un error al enviar el mensaje. Verifica tu conexión.' }
+            : msg
+        )
+      );
       setSending(false);
     }
   };
