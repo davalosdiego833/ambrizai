@@ -150,6 +150,7 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
   try {
     const knowledgeContext = await getKnowledgeContext(userMessage, history);
     
+    // Explicit high-priority intent handlers (only for clear specific intents)
     if (query.includes('extraprima') || query.includes('carta de extraprima')) {
       responseText = `### Proceso de Carta de Extraprima (SMNYL)
 
@@ -168,7 +169,7 @@ Para consultar el estatus o dar seguimiento a un folio ingresado:
 2. Ve a la sección de **Oficina Virtual (OV1 o OV2.0)**.
 3. Haz clic en **Seguimiento de Trámites / Consulta de Folios**.
 4. Escribe tu **número de folio de 8 dígitos** para verificar el estado de avance, notas del analista de SMNYL o requerimientos pendientes.`;
-    } else if (query.includes('orvi') || query.includes('orvi 99')) {
+    } else if (query.includes('orvi 99') || (query.includes('orvi') && !query.includes('cubre') && !query.includes('gmm'))) {
       responseText = `### Información Oficial: ORVI 99 (SMNYL)
 
 **ORVI 99** es un plan de protección de Vida Entera (hasta los 99 años) con acumulación de ahorro a valor en efectivo:
@@ -186,7 +187,7 @@ Para consultar el estatus o dar seguimiento a un folio ingresado:
    - **BIT:** Exención de Pago de Primas por Invalidez Total y Permanente.
    - **BMA / DI:** Beneficio de Muerte Accidental y Doble Indemnización.
    - **Valores Garantizados:** Préstamo sobre la póliza y rescate de valor en efectivo.`;
-    } else if (query.includes('imagina ser') || query.includes('imagina')) {
+    } else if (query.includes('imagina ser') && !query.includes('cubre') && !query.includes('gmm')) {
       responseText = `### Información Oficial: Imagina Ser ® (SMNYL)
 
 **Imagina Ser** es un plan de retiro con protección de vida y deducción fiscal:
@@ -196,16 +197,7 @@ Para consultar el estatus o dar seguimiento a un folio ingresado:
    - **Deducibilidad Fiscal:** Compatible con los artículos 151 (PPR) y 185 del LISR.
    - **Forma de Entrega de Ahorro:** En una sola exhibición o en renta vitalicia mensual heredable.
 2. **Moneda:** Pesos o UDIs.`;
-    } else if (query.includes('segubeca') || query.includes('beca')) {
-      responseText = `### Información Oficial: Segubeca ® (SMNYL)
-
-**Segubeca** es el plan de ahorro educativo garantizado para la universidad de los hijos:
-
-1. **Funcionamiento:**
-   - **Edad de Entrega:** Al cumplir el hijo los 18 años.
-   - **Período de Entrega:** En 1 sola exhibición o en 4 mensualidades anuales durante la carrera.
-   - **Garantía Educativa:** Si el padre/tutor fallece o sufre invalidez, la póliza queda pagada automáticamente y al cumplir 18 años el hijo recibe el ahorro contratado.`;
-    } else if (query.includes('convencion') || query.includes('convenciones') || query.includes('diamante') || query.includes('los cabos') || query.includes('vancouver') || query.includes('estambul') || query.includes('japon')) {
+    } else if (query.includes('convencion') || query.includes('convenciones') || query.includes('los cabos') || query.includes('vancouver') || query.includes('estambul') || query.includes('japon')) {
       responseText = `### Convenciones Asesores LP 2027 (SMNYL)
 
 **Destinos Oficiales por Nivel de Diamante:**
@@ -215,23 +207,21 @@ Para consultar el estatus o dar seguimiento a un folio ingresado:
 - **Gran Diamante:** Japón
 
 *Para consultar tu avance de comisiones y lugares individuales, ingresa al **Panel de Campañas de la Promotoría Ambriz** ([panel.ambrizydavalos.com](https://panel.ambrizydavalos.com)).*`;
-    } else if (query.includes('mdrt') || query.includes('orlando')) {
+    } else if (query.includes('mdrt') && !query.includes('cubre')) {
       responseText = `### Campaña MDRT 2027 (Orlando, Florida)
 
 **Metas Oficiales por Método de Producción:**
 - **Miembro MDRT:** Comisión $905,200 | Ingresos $1,567,800 | Prima Anualizada $1,810,400.
 - **Court of the Table (COT):** Comisión $2,715,600 | Ingresos $4,703,400 | Prima Anualizada $5,431,200.
-- **Top of the Table (TOT):** Comisión $5,431,200 | Ingresos $9,406,800 | Prima Anualizada $10,862,400.
-- **Aspirantes Primerizas (Uso Único):** Aspirante 1 ($905,200 en Primas) y Aspirante 2 ($1,357,800 en Primas).`;
+- **Top of the Table (TOT):** Comisión $5,431,200 | Ingresos $9,406,800 | Prima Anualizada $10,862,400.`;
     } else if (query.includes('graduacion') || query.includes('graduación')) {
       responseText = `### Campaña de Graduación (Asesores en Desarrollo)
 
 1. **Requisitos de Pólizas Acumuladas (Meses 1 a 12):**
    - **Graduación Normal:** 36 pólizas acumuladas.
    - **Graduación con Honores:** 48 pólizas acumuladas.
-2. **Regla de Continuidad ("No 0 Puntos"):** Emitir al menos 1 punto de póliza en cada mes subsecuente hasta el mes de corte.
-3. **Frecuencia:** Oportunidad única en la vida del asesor (primer año).`;
-    } else if (query.includes('vida mujer') || query.includes('mujer')) {
+2. **Regla de Continuidad ("No 0 Puntos"):** Emitir al menos 1 punto de póliza en cada mes subsecuente hasta el mes de corte.`;
+    } else if (query.includes('vida mujer') && !query.includes('cubre') && !query.includes('gmm')) {
       responseText = `### Información Oficial: Vida Mujer ® (SMNYL)
 
 **Vida Mujer** es un plan de protección y ahorro garantizado diseñado especialmente para la mujer:
@@ -245,10 +235,8 @@ Para consultar el estatus o dar seguimiento a un folio ingresado:
 
 3. **Coberturas Especiales Incluidas:**
    - **Protección por Cáncer Femenino (PCF):** Cobertura ante diagnóstico de cánceres de mama, cuello uterino, ovarios, etc.
-   - **Complicaciones del Embarazo y Padecimientos Femeninos (PEP):** Cobertura para nacimientos múltiples, recién nacido con padecimientos congénitos o complicaciones obstétricas.
-
-*Para trámites y solicitudes digitales, ingresa al **Portal de Asesores SMNYL / Oficina Virtual 2.0 (OV2)**.*`;
-    } else if (query.includes('emitir') || query.includes('emito') || query.includes('póliza') || query.includes('poliza') || query.includes('emision') || query.includes('emisión')) {
+   - **Complicaciones del Embarazo y Padecimientos Femeninos (PEP):** Cobertura para nacimientos múltiples, recién nacido con padecimientos congénitos o complicaciones obstétricas.`;
+    } else if (query.includes('pasos para emitir') || query.includes('requisitos para emision') || query.includes('como emito una poliza nueva')) {
       responseText = `### Proceso de Emisión de Pólizas en SMNYL
 
 Para realizar la emisión de una póliza nueva, sigue este procedimiento oficial:
@@ -265,60 +253,58 @@ Para realizar la emisión de una póliza nueva, sigue este procedimiento oficial
 **Tiempos estimados de respuesta (SLA):**
 - **Vida Tradicional:** 3 a 5 días hábiles.
 - **Gastos Médicos Mayores (GMM):** 5 a 7 días hábiles.`;
-    } else if (query.includes('siniestro') || query.includes('hospital') || query.includes('reembolso') || query.includes('maternidad')) {
-      responseText = `### Protocolo de Siniestros y Reembolsos (SMNYL)
-
-1. **Pago Directo en Hospital:**
-   - Presentar identificación oficial e INE en admisión del hospital de la red.
-   - Solicitar Informe Médico e Historia Clínica si la hospitalización supera 24 horas.
-
-2. **Trámite de Reembolso (Gastos Médicos o Accidentes):**
-   - Recabar facturas electrónicas XML y PDF a nombre del contratante/asegurado.
-   - Solicitud de Reembolso firmada por el titular.
-   - Informe Médico sellado y firmado por el médico tratante.
-   - Recetas médicas y estudios de laboratorio con interpretación.
-
-3. **Atención de Emergencias 24/7:**
-   - Línea Monterrey: **800 505 4000**`;
-    } else if (query.includes('folio') || query.includes('subir')) {
-      responseText = `### Registro de Folios en el Portal de Asesores SMNYL
-
-Para cargar un folio en el sistema oficial de SMNYL:
-1. Accede al **Portal de Asesores SMNYL**.
-2. Ingresa a **Trámites ➔ Subir Folio (OV1 o OV2.0)**.
-3. Selecciona el tipo de trámite (Póliza Nueva Vida, GMM, Conservación o Siniestro).
-4. Escribe el número de folio de 8 dígitos de SMNYL.
-5. Adjunta el archivo PDF completo con la solicitud y expedientes requeridos.`;
-    } else if (knowledgeContext && knowledgeContext.length > 500) {
-      // Clean and format relevant text from local knowledge files
+    } else {
+      // Smart Contextual Knowledge Extractor for specific queries (e.g. SIDA, VIH, rodilla, maternidad, etc.)
       const cleanKnowledge = knowledgeContext
         .replace(/=== DOCUMENTO: [^=]+ ===/g, '')
         .replace(/=== DOCUMENTO PDF: [^=]+ ===/g, '')
         .replace(/=== FIN DE DOCUMENTO ===/g, '')
         .trim();
+
+      const paragraphs = cleanKnowledge.split(/\n{2,}/).map(p => p.trim()).filter(p => p.length > 30);
       
-      const paragraphs = cleanKnowledge.split('\n\n').filter(p => p.trim().length > 40);
-      const excerpt = paragraphs.slice(0, 4).join('\n\n');
+      const stopWords = new Set(["como", "cómo", "hago", "un", "de", "en", "una", "y", "el", "la", "los", "las", "para", "con", "del", "por", "que", "qué", "cual", "cuál", "cuales", "cuáles", "son", "se", "mi", "mis", "su", "sus", "hacer", "puedo", "donde", "dónde", "quien", "quién", "si", "no", "o", "a", "al", "dame", "dime", "informacion", "información", "sobre", "acerca"]);
+      const queryKeywords = query.split(/\s+/).map(w => w.replace(/[^a-z0-9]/g, '')).filter(w => w.length > 2 && !stopWords.has(w));
 
-      responseText = `### Información Oficial de Seguros Monterrey New York Life (SMNYL)
+      const scoredParagraphs = paragraphs.map(p => {
+        let score = 0;
+        const pLower = p.toLowerCase();
+        queryKeywords.forEach(kw => {
+          if (kw && pLower.includes(kw)) {
+            score += 10;
+            const regex = new RegExp(`\\b${kw}\\b`, 'i');
+            if (regex.test(p)) score += 15;
+          }
+        });
+        if (pLower.includes('contenido') || pLower.includes('índice') || pLower.includes('introducción')) {
+          score -= 15;
+        }
+        return { p, score };
+      }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
 
-${excerpt || cleanKnowledge.slice(0, 1200)}...
+      if (scoredParagraphs.length > 0) {
+        const topMatches = scoredParagraphs.slice(0, 3).map(item => item.p);
+        responseText = `### Información Oficial SMNYL (Consulta de Coberturas y Procesos)
 
-*Consulta más detalles o tramita tu solicitud directamente en el **Portal de Asesores SMNYL**.*`;
-    } else {
-      responseText = `### Asistente SMNYL (Portal de Asesores)
+${topMatches.join('\n\n')}
 
-Puedo ayudarte con información detallada sobre:
-- **Productos de Vida:** Vida Mujer, Imagina Ser, Orvi 99, Nuevo Plenitud, Segubeca, Star Dotal.
-- **Gastos Médicos Mayores (GMM):** Alfa Medical Flex, Pleno, Íntegro, Beneficio de Maternidad.
-- **Procesos Administrativos:** Emisión de pólizas, seguimiento de folios, cartas de extraprima, siniestros y reembolsos.
-- **Concursos y Campañas:** Bases de Convenciones, Graduación y MDRT.
+---
+**¿Requieres validar un caso específico?**
+Para darte una confirmación exacta, indícame:
+1. ¿Cuál es el plan exacto de tu cliente (ej. Alfa Medical Flex, Pleno, Íntegro)?
+2. ¿La póliza cuenta con reconocimiento de antigüedad o fue un diagnóstico posterior al inicio de vigencia?`;
+      } else {
+        responseText = `### Asistente Inteligente SMNYL (Portal de Asesores)
 
-¿Sobre cuál de estos temas deseas consultar?`;
+Para darte la respuesta exacta, indícame un poco más de contexto sobre tu consulta:
+- **Si es sobre un Producto:** Indícame si es Vida (Imagina Ser, Vida Mujer, Orvi 99, Segubeca) o Gastos Médicos Mayores (Alfa Medical).
+- **Si es sobre una Cobertura o Exclusión:** Indícame la enfermedad, padecimiento o estudio a consultar.
+- **Si es sobre un Trámite:** Indícame si es emisión de póliza, carga de folio, carta de extraprima o reembolso de siniestro.`;
+      }
     }
   } catch (err) {
     console.error('Error en simulateStreamResponse fallback:', err);
-    responseText = "No pude acceder a la base de conocimientos en este momento. Por favor reintenta tu pregunta.";
+    responseText = "No pude procesar la consulta en este momento. Por favor reintenta tu pregunta.";
   }
 
   // Simulate streaming output by breaking it into chunks and sending them at intervals
