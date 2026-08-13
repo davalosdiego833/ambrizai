@@ -1,0 +1,14 @@
+{
+  "name": "ambriz-ai",
+  "version": "1.0.0",
+  "description": "Ambriz AI - Asistente Inteligente SMNYL",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "cd client && npm install && npm run build && cp -r dist/* ../public_html/ 2>/dev/null || true",
+    "postinstall": "cd server && npm install --omit=dev"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
