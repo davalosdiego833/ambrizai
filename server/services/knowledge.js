@@ -77,7 +77,8 @@ async function buildKnowledgeCache() {
           const mtimeMs = stats.mtimeMs;
           const size = stats.size;
 
-          if (pdfCache[relativePath] && pdfCache[relativePath].mtimeMs === mtimeMs && pdfCache[relativePath].size === size) {
+          // Match by size or presence of cached content (mtimeMs changes on git clone/deploy)
+          if (pdfCache[relativePath] && (pdfCache[relativePath].size === size || pdfCache[relativePath].content)) {
             docs.push({
               path: filePath,
               relativePath,
@@ -85,20 +86,22 @@ async function buildKnowledgeCache() {
               content: pdfCache[relativePath].content
             });
           } else {
-            console.log(`📄 Procesando PDF: ${relativePath}...`);
+            console.log(`📄 Procesando PDF nuevo o modificado: ${relativePath}...`);
             const dataBuffer = fs.readFileSync(filePath);
-            const parser = new PDFParse({ data: dataBuffer });
-            const data = await parser.text();
+            const uint8Array = new Uint8Array(dataBuffer);
+            const parser = new PDFParse({ data: uint8Array });
+            const parsedResult = await parser.text();
+            const textContent = typeof parsedResult === 'string' ? parsedResult : (parsedResult?.text || '');
             docs.push({
               path: filePath,
               relativePath,
               ext,
-              content: data
+              content: textContent
             });
             pdfCache[relativePath] = {
               mtimeMs,
               size,
-              content: data
+              content: textContent
             };
             cacheUpdated = true;
           }
