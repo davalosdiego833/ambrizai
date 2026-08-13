@@ -48,98 +48,87 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 }
 
 let cachedDocs = null; // Array of { path: string, relativePath: string, ext: string, content: string }
-let lastLoadTime = 0;
+let isBuildingCache = false;
 
-export async function getKnowledgeContext(query = null, history = []) {
+async function buildKnowledgeCache() {
+  if (isBuildingCache) return;
+  isBuildingCache = true;
   try {
     const allFiles = getAllFiles(KNOWLEDGE_DIR);
-    
-    // Find the latest modification time of all files
-    let maxMtime = 0;
+    console.log('🔄 Cargando caché de conocimientos en memoria...');
+    const docs = [];
+    let cacheUpdated = false;
+
     for (const filePath of allFiles) {
-      try {
-        const stats = fs.statSync(filePath);
-        if (stats.mtimeMs > maxMtime) {
-          maxMtime = stats.mtimeMs;
+      const ext = path.extname(filePath).toLowerCase();
+      const relativePath = path.relative(KNOWLEDGE_DIR, filePath);
+
+      if (ext === '.txt' || ext === '.md') {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        docs.push({
+          path: filePath,
+          relativePath,
+          ext,
+          content
+        });
+      } else if (ext === '.pdf') {
+        try {
+          const stats = fs.statSync(filePath);
+          const mtimeMs = stats.mtimeMs;
+          const size = stats.size;
+
+          if (pdfCache[relativePath] && pdfCache[relativePath].mtimeMs === mtimeMs && pdfCache[relativePath].size === size) {
+            docs.push({
+              path: filePath,
+              relativePath,
+              ext,
+              content: pdfCache[relativePath].content
+            });
+          } else {
+            console.log(`📄 Procesando PDF: ${relativePath}...`);
+            const dataBuffer = fs.readFileSync(filePath);
+            const parser = new PDFParse({ data: dataBuffer });
+            const data = await parser.text();
+            docs.push({
+              path: filePath,
+              relativePath,
+              ext,
+              content: data
+            });
+            pdfCache[relativePath] = {
+              mtimeMs,
+              size,
+              content: data
+            };
+            cacheUpdated = true;
+          }
+        } catch (pdfErr) {
+          console.error(`Error procesando PDF ${relativePath}:`, pdfErr);
         }
-      } catch (e) {
-        // Ignore stats errors
       }
     }
 
-    // If cache is empty or files have been modified, load docs into memory
-    if (!cachedDocs || maxMtime > lastLoadTime) {
-      console.log('🔄 Reconstruyendo el caché de conocimientos...');
-      const docs = [];
-      let cacheUpdated = false;
-
-      for (const filePath of allFiles) {
-        const ext = path.extname(filePath).toLowerCase();
-        const relativePath = path.relative(KNOWLEDGE_DIR, filePath);
-
-        if (ext === '.txt' || ext === '.md') {
-          const content = fs.readFileSync(filePath, 'utf-8');
-          docs.push({
-            path: filePath,
-            relativePath,
-            ext,
-            content
-          });
-        } else if (ext === '.pdf') {
-          try {
-            const stats = fs.statSync(filePath);
-            const mtimeMs = stats.mtimeMs;
-            const size = stats.size;
-
-            // Use cached text if size and mod time match
-            if (pdfCache[relativePath] && pdfCache[relativePath].mtimeMs === mtimeMs && pdfCache[relativePath].size === size) {
-              docs.push({
-                path: filePath,
-                relativePath,
-                ext,
-                content: pdfCache[relativePath].content
-              });
-            } else {
-              console.log(`📄 Procesando nuevo o modificado PDF: ${relativePath}...`);
-              const dataBuffer = fs.readFileSync(filePath);
-              const uint8Array = new Uint8Array(dataBuffer);
-              const parser = new PDFParse({ data: uint8Array });
-              const parsedPdf = await parser.getText();
-              const parsedText = parsedPdf.text;
-
-              docs.push({
-                path: filePath,
-                relativePath,
-                ext,
-                content: parsedText
-              });
-
-              pdfCache[relativePath] = {
-                mtimeMs,
-                size,
-                content: parsedText
-              };
-              cacheUpdated = true;
-            }
-          } catch (pdfErr) {
-            console.error(`Error al procesar PDF ${relativePath}:`, pdfErr);
-          }
-        }
+    cachedDocs = docs;
+    if (cacheUpdated) {
+      try {
+        fs.writeFileSync(CACHE_FILE, JSON.stringify(pdfCache), 'utf-8');
+        console.log('💾 Caché persistente de PDFs actualizada en disco.');
+      } catch (writeErr) {
+        console.error('Error al guardar caché de PDFs:', writeErr);
       }
+    }
+    console.log(`✅ Base de conocimientos en memoria lista. Total documentos: ${cachedDocs.length}`);
+  } catch (err) {
+    console.error('Error al construir caché de conocimientos:', err);
+  } finally {
+    isBuildingCache = false;
+  }
+}
 
-      // Save updated cache back to disk
-      if (cacheUpdated) {
-        try {
-          fs.writeFileSync(CACHE_FILE, JSON.stringify(pdfCache, null, 2));
-          console.log('💾 Caché persistente de PDFs guardada en disco.');
-        } catch (err) {
-          console.error('Error al guardar caché persistente de PDFs:', err);
-        }
-      }
-
-      cachedDocs = docs;
-      lastLoadTime = Date.now();
-      console.log('✅ Caché de conocimientos cargado con éxito. Total de documentos:', cachedDocs.length);
+export async function getKnowledgeContext(query = null, history = []) {
+  try {
+    if (!cachedDocs) {
+      await buildKnowledgeCache();
     }
 
     if (cachedDocs.length === 0) {
