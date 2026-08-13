@@ -23,8 +23,8 @@ export async function streamChatResponse(history, userMessage, onChunk, onDone, 
   const currentKey = process.env.GEMINI_API_KEY;
   
   // If no Gemini API Key, run in smart local knowledge engine mode
-  if (!currentKey || currentKey.startsWith('AQ.')) {
-    console.log('⚡ Usando motor de conocimientos local de Ambriz AI...');
+  if (!currentKey) {
+    console.log('⚡ Usando motor de conocimientos local de Ambriz AI (sin API key)...');
     return simulateStreamResponse(history, userMessage, onChunk, onDone, onError);
   }
 
