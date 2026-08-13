@@ -13,21 +13,49 @@ const USERS_FILE = path.join(__dirname, '../data/users.json');
 
 const router = express.Router();
 
+const restoreLatestUsersBackup = () => {
+  try {
+    const backupDir = path.join(__dirname, '../backups');
+    if (!fs.existsSync(backupDir)) return null;
+    const files = fs.readdirSync(backupDir)
+      .filter(f => f.startsWith('users_backup_') && f.endsWith('.json'))
+      .sort((a, b) => b.localeCompare(a));
+    if (files.length > 0) {
+      const latestBackup = path.join(backupDir, files[0]);
+      console.log(`🔄 Restaurando base de usuarios desde backup: ${latestBackup}`);
+      const content = fs.readFileSync(latestBackup, 'utf-8');
+      fs.writeFileSync(USERS_FILE, content, 'utf-8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error('Error al restaurar usuarios desde backup:', e);
+  }
+  return null;
+};
+
 // Helper to read users DB
 const readUsersDB = () => {
   try {
+    if (!fs.existsSync(USERS_FILE)) {
+      return restoreLatestUsersBackup() || [];
+    }
     const data = fs.readFileSync(USERS_FILE, 'utf-8');
+    if (!data || !data.trim()) {
+      return restoreLatestUsersBackup() || [];
+    }
     return JSON.parse(data);
   } catch (err) {
-    console.error('Error reading users DB:', err);
-    return [];
+    console.error('Error reading users DB (attempting backup restore):', err);
+    return restoreLatestUsersBackup() || [];
   }
 };
 
-// Helper to write users DB
+// Helper to write users DB atomically
 const writeUsersDB = (data) => {
   try {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    const tempFile = `${USERS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempFile, USERS_FILE);
   } catch (err) {
     console.error('Error writing users DB:', err);
   }

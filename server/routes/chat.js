@@ -24,21 +24,50 @@ if (!fs.existsSync(FOLDERS_FILE)) {
 
 const router = express.Router();
 
-// Helper to read chats database
+const restoreLatestBackup = (dbName) => {
+  try {
+    const backupDir = path.join(__dirname, '../backups');
+    if (!fs.existsSync(backupDir)) return null;
+    const files = fs.readdirSync(backupDir)
+      .filter(f => f.startsWith(`${dbName}_backup_`) && f.endsWith('.json'))
+      .sort((a, b) => b.localeCompare(a));
+    if (files.length > 0) {
+      const latestBackup = path.join(backupDir, files[0]);
+      console.log(`🔄 Restaurando base de datos ${dbName} desde backup: ${latestBackup}`);
+      const content = fs.readFileSync(latestBackup, 'utf-8');
+      const targetFile = path.join(__dirname, `../data/${dbName}.json`);
+      fs.writeFileSync(targetFile, content, 'utf-8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error(`Error al restaurar backup para ${dbName}:`, e);
+  }
+  return null;
+};
+
+// Helper to read chats database with auto-backup restoration
 const readChatsDB = () => {
   try {
+    if (!fs.existsSync(CHATS_FILE)) {
+      return restoreLatestBackup('chats') || {};
+    }
     const data = fs.readFileSync(CHATS_FILE, 'utf-8');
+    if (!data || !data.trim()) {
+      return restoreLatestBackup('chats') || {};
+    }
     return JSON.parse(data);
   } catch (err) {
-    console.error('Error reading chats DB:', err);
-    return {};
+    console.error('Error reading chats DB (attempting backup restore):', err);
+    return restoreLatestBackup('chats') || {};
   }
 };
 
-// Helper to write chats database
+// Helper to write chats database atomically
 const writeChatsDB = (data) => {
   try {
-    fs.writeFileSync(CHATS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    const tempFile = `${CHATS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempFile, CHATS_FILE);
   } catch (err) {
     console.error('Error writing chats DB:', err);
   }
@@ -47,18 +76,26 @@ const writeChatsDB = (data) => {
 // Helper to read folders database
 const readFoldersDB = () => {
   try {
+    if (!fs.existsSync(FOLDERS_FILE)) {
+      return restoreLatestBackup('folders') || {};
+    }
     const data = fs.readFileSync(FOLDERS_FILE, 'utf-8');
+    if (!data || !data.trim()) {
+      return restoreLatestBackup('folders') || {};
+    }
     return JSON.parse(data);
   } catch (err) {
-    console.error('Error reading folders DB:', err);
-    return {};
+    console.error('Error reading folders DB (attempting backup restore):', err);
+    return restoreLatestBackup('folders') || {};
   }
 };
 
-// Helper to write folders database
+// Helper to write folders database atomically
 const writeFoldersDB = (data) => {
   try {
-    fs.writeFileSync(FOLDERS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    const tempFile = `${FOLDERS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempFile, FOLDERS_FILE);
   } catch (err) {
     console.error('Error writing folders DB:', err);
   }
