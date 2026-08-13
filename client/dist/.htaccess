@@ -1,0 +1,18 @@
+PassengerNodejs /opt/alt/alt-nodejs20/root/usr/bin/node
+PassengerAppRoot /home/u211138134/domains/ai.ambrizydavalos.com/nodejs/server
+PassengerAppType node
+PassengerStartupFile index.js
+PassengerBaseURI /
+
+RewriteEngine On
+
+# Block access to git/configs
+RedirectMatch 404 /\.git
+
+# Fallback SPA (only if it is not an API request)
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
