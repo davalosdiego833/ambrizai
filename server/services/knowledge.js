@@ -158,6 +158,12 @@ export async function getKnowledgeContext(query = null, history = []) {
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9\s]/g, " ");
 
+    const isSocialGreeting = /^(hola|buenos\s+dias|buenas\s+tardes|buenas\s+noches|que\s+tal|saludos|quien\s+eres|hola\s+ambriz|gracias|excelente|ayuda)$/i.test(cleanQuery.trim());
+    if (isSocialGreeting) {
+      const procDoc = baseDocs.find(d => d.relativePath.includes('procesos_generales.txt'));
+      return procDoc ? `=== DOCUMENTO: procesos_generales.txt ===\n${procDoc.content}\n=== FIN DE DOCUMENTO ===` : 'Asistente Ambriz AI - Promotoría Ambriz';
+    }
+
     const isCampaignQuery = ['campana', 'campanas', 'campaña', 'campañas', 'convencion', 'convenciones', 'graduacion', 'graduación', 'mdrt', 'concurso', 'concursos', 'bono', 'bonos', 'diamante'].some(k => cleanQuery.includes(k));
 
     // Build filtered text context: include general process files, only include campaign files if query is campaign-related
@@ -176,20 +182,20 @@ export async function getKnowledgeContext(query = null, history = []) {
     const PRODUCTS = [
       { key: 'campanas', keywords: ['campana', 'campanas', 'campaña', 'campañas', 'graduacion', 'graduación', 'mdrt', 'aspirante 1', 'aspirante 2', 'aspirante', 'cumbre', 'legion centurion', 'legión centurión', 'rda', 'convenciones'] },
       { key: 'medicos a tu lado', keywords: ['medicos a tu lado', 'médicos a tu lado', 'doctores'] },
-      { key: 'alfa medical', keywords: ['alfa medical', 'alfa'] },
+      { key: 'alfa medical', keywords: ['alfa medical', 'alfa', 'flex', 'pleno', 'integro', 'practico'] },
       { key: 'suma proteccion', keywords: ['suma proteccion', 'suma protección', 'deducible exceso'] },
       { key: 'fair play', keywords: ['fair play', 'fairplay', 'traspaso', 'traspasos', 'malas practicas', 'malas prácticas'] },
       { key: 'cuaderno de concursos', keywords: ['cuaderno', 'concurso', 'concursos', 'bono', 'bonos'] },
       { key: 'comisiones', keywords: ['comision', 'comisiones', 'comisiona', 'comisionar', 'porcentaje'] },
-      { key: 'vida mujer', keywords: ['vida mujer', 'mujer'] },
-      { key: 'imagina ser', keywords: ['imagina ser', 'imagina'] },
+      { key: 'vida mujer', keywords: ['vida mujer', 'mujer', 'dote', 'dotes'] },
+      { key: 'imagina ser', keywords: ['imagina ser', 'imagina', 'ppr', 'retiro'] },
       { key: 'nuevo plenitud', keywords: ['nuevo plenitud', 'plenitud'] },
       { key: 'objetivo vida', keywords: ['objetivo vida', 'objetivo'] },
       { key: 'orvi 99', keywords: ['orvi 99', 'orvi'] },
       { key: 'segubeca', keywords: ['segubeca', 'beca', 'estudios'] },
       { key: 'star dotal', keywords: ['star dotal', 'dotal'] },
-      { key: 'star temporal', keywords: ['star temporal', 'temporal'] },
-      { key: 'gastos medicos', keywords: ['gastos medicos', 'gastos médicos', 'gmm'] }
+      { key: 'star temporal', keywords: ['star temporal', 'temporal', 'hombre clave'] },
+      { key: 'gastos medicos', keywords: ['gastos medicos', 'gastos médicos', 'gmm', 'hospital', 'reembolso', 'maternidad', 'tabulador'] }
     ];
 
     const mentionedProducts = [];
