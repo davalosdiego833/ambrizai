@@ -315,8 +315,8 @@ export async function getKnowledgeContext(query = null, history = []) {
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score);
 
-    // Get the top 4 matching PDFs to ensure full coverage across product manuals, conditions and guidelines
-    const selectedPdfs = rankedPdfs.slice(0, 4).map(item => item.doc);
+    // Get top 3 matching PDFs to ensure full coverage while keeping context compact and fast
+    const selectedPdfs = rankedPdfs.slice(0, 3).map(item => item.doc);
 
     console.log(`🔍 Búsqueda de Contexto para: "${query}"`);
     console.log(`   Palabras clave: [${keywords.join(', ')}]`);
@@ -326,7 +326,7 @@ export async function getKnowledgeContext(query = null, history = []) {
     console.log(`   PDFs seleccionados: ${selectedPdfs.map(d => d.relativePath).join(', ') || 'Ninguno'}`);
 
     for (const doc of selectedPdfs) {
-      const docContent = extractRelevantContent(doc.content, keywords, 12000);
+      const docContent = extractRelevantContent(doc.content, keywords, 6000);
       context += `\n\n=== DOCUMENTO PDF: ${doc.relativePath} ===\n${docContent}\n=== FIN DE DOCUMENTO ===\n`;
     }
 
@@ -337,7 +337,7 @@ export async function getKnowledgeContext(query = null, history = []) {
   }
 }
 
-function extractRelevantContent(content, keywords, maxChars = 12000) {
+function extractRelevantContent(content, keywords, maxChars = 6000) {
   if (!content || content.length <= maxChars) return content;
   
   const paragraphs = content.split(/(?:\r?\n){2,}/);

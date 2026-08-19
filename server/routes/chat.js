@@ -377,6 +377,19 @@ router.post('/message', (req, res) => {
   // Write immediate initial ping to establish connection with mobile/browser socket instantly
   res.write(': ping\n\n');
 
+  // Heartbeat timer to keep connection alive on LiteSpeed / proxies during long AI responses
+  const heartbeatTimer = setInterval(() => {
+    if (!res.writableEnded) {
+      res.write(': heartbeat\n\n');
+    } else {
+      clearInterval(heartbeatTimer);
+    }
+  }, 2500);
+
+  const cleanupHeartbeat = () => {
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+  };
+
   let botMessageContent = '';
   
   // Callback when a chunk arrives
@@ -387,6 +400,7 @@ router.post('/message', (req, res) => {
 
   // Callback when streaming finishes
   const onDone = () => {
+    cleanupHeartbeat();
     // Save bot message to the persistent store
     const botMessage = {
       id: `msg_b_${Date.now()}`,
@@ -413,6 +427,7 @@ router.post('/message', (req, res) => {
 
   // Callback on stream error
   const onError = (err) => {
+    cleanupHeartbeat();
     console.error('Error durante streaming de chat:', err);
     res.write(`data: ${JSON.stringify({ error: err?.message || 'Error al procesar respuesta' })}\n\n`);
     res.end();
