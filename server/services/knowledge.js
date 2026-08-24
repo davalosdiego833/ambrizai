@@ -90,7 +90,7 @@ async function buildKnowledgeCache() {
             const dataBuffer = fs.readFileSync(filePath);
             const uint8Array = new Uint8Array(dataBuffer);
             const parser = new PDFParse({ data: uint8Array });
-            const parsedResult = await parser.text();
+            const parsedResult = await parser.getText();
             const textContent = typeof parsedResult === 'string' ? parsedResult : (parsedResult?.text || '');
             docs.push({
               path: filePath,
