@@ -22,9 +22,30 @@ function extractSources(knowledgeBase) {
       label: path.basename(relativePath, path.extname(relativePath)),
     });
   }
-  // Chunks arrive pre-sorted by relevance, so the first few unique documents
-  // are the most relevant ones — cap the chip list so it stays readable.
-  return sources.slice(0, 4);
+  // NOTE: deliberately NOT capped here — this list doubles as the candidate
+  // pool for validating which documents the model says it actually used
+  // (see resolveDeclaredSources), and the right one isn't always in the
+  // top few by raw retrieval rank. Cap at the actual display call sites.
+  return sources;
+}
+
+// Maps the document paths the model *says* it used (from the "[FUENTES: ...]"
+// marker) back to friendly {path, label} objects — matched against the docs
+// that were actually retrieved, so a typo'd/hallucinated path never shows up
+// as a fake citation.
+function resolveDeclaredSources(declaredPaths, retrievedSources) {
+  const resolved = [];
+  const seen = new Set();
+  for (const declared of declaredPaths) {
+    const normDeclared = declared.toLowerCase();
+    const match = retrievedSources.find((s) => s.path.toLowerCase() === normDeclared)
+      || retrievedSources.find((s) => s.path.toLowerCase().includes(normDeclared) || normDeclared.includes(s.path.toLowerCase()));
+    if (match && !seen.has(match.path)) {
+      seen.add(match.path);
+      resolved.push(match);
+    }
+  }
+  return resolved.slice(0, 4);
 }
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -98,7 +119,14 @@ export async function streamChatResponse(history, userMessage, onChunk, onDone, 
     // back to the old keyword-based picker only if the vector index isn't
     // built yet or the embedding call fails for some reason.
     const knowledgeBase = (await getSemanticContext(userMessage, history)) || (await getKnowledgeContext(userMessage, history));
-    if (onSources) onSources(extractSources(knowledgeBase));
+    // NOTE: we don't call onSources with the raw retrieved documents here —
+    // retrieval often pulls a couple of irrelevant near-misses alongside the
+    // right ones (similarity scores can land within hundredths of each
+    // other). Citing "whatever got retrieved" mislabels answers with docs
+    // the model never actually used. Instead we ask the model itself to
+    // declare which of the provided documents it drew from (see the
+    // "[FUENTES: ...]" marker below), and report only those.
+    const retrievedSources = extractSources(knowledgeBase);
     const systemPrompt = `Eres Ambriz AI, un asistente virtual de inteligencia artificial de nivel experto, altamente fluido, conversacional, servicial y brillante de la Promotoría Ambriz, especialista oficial en Seguros Monterrey New York Life (SMNYL).
 
 Tu objetivo es actuar como un consultor senior inteligente: conversar con fluidez natural, empatía, elegancia y precisión técnica impecable. Cuando el asesor te consulte sobre temas generales, te pida orientación o te pregunte cómo puedes ayudarle (por ejemplo: "¿cómo me puedes ayudar con productos de Vida?", "¿qué puedo preguntarte?", "¿cómo funciona este proceso?"), responde con soltura, claridad y elegancia, explicando detalladamente todas las formas en las que puedes asesorarle y brindándole ejemplos prácticos de preguntas que puede hacerte.
@@ -137,6 +165,12 @@ Instrucciones de interpretación, cortesía y fluidez conversacional:
 
 Si el usuario te pregunta sobre algo fuera del conocimiento provisto, responde amablemente indicando que no cuentas con esa información por el momento y sugiriéndole consultar su duda en su grupo de WhatsApp. No inventes respuestas ni intentes adivinar.
 
+13. **REGLA OBLIGATORIA DE CITADO DE FUENTES:** Se te proveerán varios documentos marcados como "=== DOCUMENTO: <ruta> ===". Algunos pueden no ser relevantes para la pregunta — ignóralos. ANTES de escribir tu respuesta, en la primerísima línea de tu mensaje, escribe EXACTAMENTE en este formato (sin explicación adicional, sin markdown):
+[FUENTES: <ruta1>|<ruta2>]
+- Incluye SOLO las rutas (copiadas EXACTAMENTE como aparecen tras "=== DOCUMENTO: ") de los documentos que realmente usaste para construir la respuesta. Máximo 4.
+- Si no usaste ningún documento del conocimiento provisto (ej. un saludo o pregunta general), escribe: [FUENTES: ninguno]
+- Inmediatamente después de esa línea, en la línea siguiente, escribe tu respuesta normal para el asesor (esa línea de fuentes nunca es visible para él, así que nunca la menciones ni te refieras a ella).
+
 CONOCIMIENTO OFICIAL DE SEGUROS MONTERREY NEW YORK LIFE (SMNYL):
 ${knowledgeBase}`;
 
@@ -167,14 +201,55 @@ ${knowledgeBase}`;
         const result = await chat.sendMessageStream(userMessage);
 
         let receivedAnyChunk = false;
-        let fullBotText = '';
+        let fullBotText = ''; // only the VISIBLE answer, marker line excluded
+        let sourcesResolved = false;
+        let pendingBuffer = '';
+
         for await (const chunk of result.stream) {
           const text = chunk.text();
-          if (text) {
-            receivedAnyChunk = true;
+          if (!text) continue;
+          receivedAnyChunk = true;
+
+          if (sourcesResolved) {
             fullBotText += text;
             onChunk(text);
+            continue;
           }
+
+          pendingBuffer += text;
+          const markerMatch = pendingBuffer.match(/^\s*\[FUENTES:([^\]]*)\]\s*\n?/);
+          if (markerMatch) {
+            sourcesResolved = true;
+            const declared = markerMatch[1].trim();
+            const declaredPaths = declared.toLowerCase() === 'ninguno'
+              ? []
+              : declared.split('|').map((p) => p.trim()).filter(Boolean);
+            if (onSources) onSources(resolveDeclaredSources(declaredPaths, retrievedSources));
+
+            const remainder = pendingBuffer.slice(markerMatch[0].length);
+            pendingBuffer = '';
+            if (remainder) {
+              fullBotText += remainder;
+              onChunk(remainder);
+            }
+          } else if (pendingBuffer.length > 400 || (pendingBuffer.trim().length > 0 && pendingBuffer.trimStart()[0] !== '[')) {
+            // The model didn't open with the expected marker (or it's
+            // dragging on too long) — give up waiting, flush what we have,
+            // and fall back to the raw retrieval list rather than showing
+            // no sources at all.
+            sourcesResolved = true;
+            if (onSources) onSources(retrievedSources.slice(0, 4));
+            fullBotText += pendingBuffer;
+            onChunk(pendingBuffer);
+            pendingBuffer = '';
+          }
+        }
+
+        // Stream ended while still buffering a short/marker-less response.
+        if (!sourcesResolved && pendingBuffer) {
+          if (onSources) onSources(retrievedSources.slice(0, 4));
+          fullBotText += pendingBuffer;
+          onChunk(pendingBuffer);
         }
 
         if (receivedAnyChunk) {
@@ -220,7 +295,7 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
     // que no coincidiera con una respuesta fija de abajo hacía que este modo tronara
     // en el catch y devolviera "No pude procesar la consulta en este momento".
     const knowledgeContext = await getKnowledgeContext(userMessage, history);
-    if (onSources) onSources(extractSources(knowledgeContext));
+    if (onSources) onSources(extractSources(knowledgeContext).slice(0, 4));
 
     const isGreeting = /^(hola|buenos\s+dias|buenas\s+tardes|buenas\s+noches|que\s+tal|saludos|quien\s+eres|hola\s+ambriz|ayuda)/i.test(query);
 
