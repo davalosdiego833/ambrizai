@@ -88,7 +88,7 @@ router.post('/login', async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'ambriz_ai_jwt_secret_key_2026_super_secure',
+      process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
 

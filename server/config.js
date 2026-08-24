@@ -1,22 +1,33 @@
 // Production configuration fallback
-// This file provides environment variable defaults when .env is not available
-// (e.g., Hostinger deployment where .env is in .gitignore)
+// Provides non-secret defaults when hosting environment variables are missing.
+//
+// IMPORTANT: No secrets live in this file. GEMINI_API_KEY and JWT_SECRET must
+// be set as real environment variables — either in Hostinger's Node.js App
+// Manager -> Environment Variables, or in a .env file placed directly on the
+// server (never committed to git). This file must load AFTER dotenv (see
+// index.js) so a local .env is always respected first.
 
-// Encoded to prevent GitHub secret scanning from blocking pushes
-const _k = Buffer.from('QVEuQWI4Uk42STlfckxfbWU0eDBDMTR5bXVUT2dIOEM4YkxjUmhpRDNabV9rRDFOeThwYnc=', 'base64').toString('utf-8');
+import crypto from 'crypto';
 
 const config = {
   PORT: process.env.PORT || 5050,
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || _k,
-  JWT_SECRET: process.env.JWT_SECRET || 'ambriz_ai_jwt_secret_key_2026_super_secure',
-  NODE_ENV: process.env.NODE_ENV || 'production'
+  NODE_ENV: process.env.NODE_ENV || 'production',
 };
 
-// Set them as environment variables so the rest of the app can use process.env
-Object.entries(config).forEach(([key, value]) => {
-  if (!process.env[key]) {
-    process.env[key] = value;
-  }
-});
+// Non-secret defaults are safe to write back into process.env.
+process.env.PORT = process.env.PORT || config.PORT;
+process.env.NODE_ENV = process.env.NODE_ENV || config.NODE_ENV;
+
+if (!process.env.GEMINI_API_KEY) {
+  console.warn('⚠️ GEMINI_API_KEY no está configurada. El chat funcionará en Modo Simulado hasta que se configure como variable de entorno.');
+}
+
+if (!process.env.JWT_SECRET) {
+  // Never fall back to a fixed, human-readable secret — that defeats the
+  // purpose (anyone who has ever seen this file/repo could forge sessions).
+  // Generate a random one for this process instead, and warn loudly.
+  process.env.JWT_SECRET = crypto.randomBytes(48).toString('hex');
+  console.warn('⚠️ JWT_SECRET no está configurada como variable de entorno. Se generó una temporal solo para esta ejecución (las sesiones no sobrevivirán un reinicio del servidor). Configúrala en Hostinger para producción.');
+}
 
 export default config;

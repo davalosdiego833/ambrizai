@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getKnowledgeContext } from './knowledge.js';
 
-const CANDIDATE_MODELS = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-2.5-pro'];
+const CANDIDATE_MODELS = ['gemini-3.6-flash', 'gemini-3.1-pro-preview', 'gemini-2.5-flash', 'gemini-2.5-pro'];
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (apiKey) {
@@ -139,6 +139,11 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
   let responseText = '';
 
   try {
+    // Bug crítico corregido: esta variable nunca se cargaba, así que cualquier pregunta
+    // que no coincidiera con una respuesta fija de abajo hacía que este modo tronara
+    // en el catch y devolviera "No pude procesar la consulta en este momento".
+    const knowledgeContext = await getKnowledgeContext(userMessage, history);
+
     const isGreeting = /^(hola|buenos\s+dias|buenas\s+tardes|buenas\s+noches|que\s+tal|saludos|quien\s+eres|hola\s+ambriz|ayuda)/i.test(query);
 
     if (isGreeting) {

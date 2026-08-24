@@ -17,7 +17,7 @@ export default function authMiddleware(req, res, next) {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'ambriz_ai_jwt_secret_key_2026_super_secure');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Check if user is blocked in users.json
     if (fs.existsSync(USERS_FILE)) {

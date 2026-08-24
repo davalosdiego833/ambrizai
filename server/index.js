@@ -1,5 +1,5 @@
-import './config.js'; // Load fallback env vars FIRST
-import 'dotenv/config'; // Then override with .env if it exists
+import 'dotenv/config'; // Load .env first (local dev / server .env)
+import './config.js'; // Then fill in safe non-secret defaults for whatever is still missing
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
