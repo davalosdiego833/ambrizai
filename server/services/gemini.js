@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { getKnowledgeContext } from './knowledge.js';
+import { getKnowledgeContext, getSemanticContext } from './knowledge.js';
 
 const CANDIDATE_MODELS = ['gemini-3.6-flash', 'gemini-3.1-pro-preview', 'gemini-2.5-flash', 'gemini-2.5-pro'];
 
@@ -30,7 +30,10 @@ export async function streamChatResponse(history, userMessage, onChunk, onDone, 
   const genAI = new GoogleGenerativeAI(currentKey);
 
   try {
-    const knowledgeBase = await getKnowledgeContext(userMessage, history);
+    // Prefer real semantic (RAG) search over the whole knowledge base; fall
+    // back to the old keyword-based picker only if the vector index isn't
+    // built yet or the embedding call fails for some reason.
+    const knowledgeBase = (await getSemanticContext(userMessage, history)) || (await getKnowledgeContext(userMessage, history));
     const systemPrompt = `Eres Ambriz AI, un asistente virtual de inteligencia artificial de nivel experto, altamente fluido, conversacional, servicial y brillante de la Promotoría Ambriz, especialista oficial en Seguros Monterrey New York Life (SMNYL).
 
 Tu objetivo es actuar como un consultor senior inteligente: conversar con fluidez natural, empatía, elegancia y precisión técnica impecable. Cuando el asesor te consulte sobre temas generales, te pida orientación o te pregunte cómo puedes ayudarle (por ejemplo: "¿cómo me puedes ayudar con productos de Vida?", "¿qué puedo preguntarte?", "¿cómo funciona este proceso?"), responde con soltura, claridad y elegancia, explicando detalladamente todas las formas en las que puedes asesorarle y brindándole ejemplos prácticos de preguntas que puede hacerte.

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PDFParse } from 'pdf-parse';
+import { embedQuery, search, getIndexSize } from './vectorStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -125,6 +126,52 @@ async function buildKnowledgeCache() {
     console.error('Error al construir caché de conocimientos:', err);
   } finally {
     isBuildingCache = false;
+  }
+}
+
+// Ensures the doc cache is built and returns the raw list of documents
+// (used by the vector indexer so it doesn't have to re-implement PDF/txt loading).
+export async function getAllCachedDocs() {
+  if (!cachedDocs) {
+    await buildKnowledgeCache();
+  }
+  return cachedDocs || [];
+}
+
+/**
+ * Real semantic (RAG) retrieval: embeds the question and searches the whole
+ * vector index by meaning instead of literal keyword overlap, across ALL
+ * indexed documents (not just a pre-filtered top-3). Returns null (so the
+ * caller can fall back to getKnowledgeContext) when the index isn't built
+ * yet or something goes wrong — this must never throw and break the chat.
+ */
+export async function getSemanticContext(query, history = [], topK = 12) {
+  try {
+    if (!query || !process.env.GEMINI_API_KEY) return null;
+    if (getIndexSize() === 0) return null;
+
+    // Fold in a bit of recent conversation so follow-up questions ("¿y ese
+    // producto cuánto dura?") still retrieve the right passages.
+    const recentTurns = (history || [])
+      .slice(-4)
+      .map((m) => m.text)
+      .filter(Boolean)
+      .join('\n');
+    const effectiveQuery = recentTurns ? `${recentTurns}\n${query}` : query;
+
+    const queryVector = await embedQuery(effectiveQuery);
+    const results = search(queryVector, topK);
+
+    if (!results || results.length === 0) return null;
+
+    let context = '';
+    for (const r of results) {
+      context += `\n\n=== DOCUMENTO: ${r.relativePath} (relevancia semántica) ===\n${r.text}\n=== FIN DE FRAGMENTO ===\n`;
+    }
+    return context;
+  } catch (err) {
+    console.error('Error en búsqueda semántica (usando fallback por palabras clave):', err);
+    return null;
   }
 }
 
