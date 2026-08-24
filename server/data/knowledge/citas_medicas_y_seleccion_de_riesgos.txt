@@ -1,0 +1,30 @@
+CITAS MÉDICAS Y SELECCIÓN DE RIESGOS PARA ASESORES
+
+1. CÓMO REAGENDAR UNA CITA MÉDICA
+Para reagendar una cita médica, es importante seguir el siguiente proceso:
+
+- **Paso 1: Confirmar disponibilidad con el cliente.**
+  Preguntar nuevamente al cliente qué día y horario tiene disponibilidad, considerando que la nueva cita deberá solicitarse con al menos 48 horas de anticipación.
+
+- **Paso 2: Solicitar la reagenda por correo.**
+  Enviar un correo a la misma dirección mediante la cual se gestionó la cita originalmente, informando que el cliente no podrá asistir y que se desea reagendar.
+  En el correo se deberá incluir:
+  * Nombre del cliente.
+  * Nuevo día solicitado.
+  * Horario solicitado.
+  * Adjuntar nuevamente el formato de requisitos adicionales que fue enviado desde la primera solicitud.
+
+- **Paso 3: Esperar confirmación.**
+  Una vez enviada la solicitud, esperar la confirmación de la nueva cita por parte del área correspondiente.
+
+Importante: la cita se considera reagendada únicamente cuando se recibe la confirmación correspondiente.
+
+2. REQUISITOS ADICIONALES Y SELECCIÓN DE RIESGOS: A DÓNDE PREGUNTAR
+Para cualquier tema relacionado con Requisitos Adicionales y Selección de Riesgos, se debe enviar un correo a:
+**dudas.sr@mnyl.com.mx**
+
+En ese correo se pueden consultar temas como:
+- Dudas sobre requisitos médicos adicionales.
+- Extraprimas o condiciones especiales.
+- Reconsideraciones de rechazo o revisión de exclusiones.
+- Valoración de casos médicos especiales.
