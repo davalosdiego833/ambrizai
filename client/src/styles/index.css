@@ -64,6 +64,47 @@
 }
 
 /* ═══════════════════════════════════════════════════════
+   DARK THEME — toggled via [data-theme="dark"] on <html>
+   (see hooks/useTheme.js). Same token names, dark values,
+   so every component that already uses var(--...) adapts
+   automatically — no per-component overrides needed.
+   ═══════════════════════════════════════════════════════ */
+:root[data-theme='dark'] {
+  --bg-primary: #0d1220;
+  --bg-secondary: #161d2e;
+  --bg-tertiary: #202a40;
+  --bg-glass: rgba(22, 29, 46, 0.75);
+  --bg-glass-hover: rgba(32, 42, 64, 0.85);
+  --bg-input: rgba(255, 255, 255, 0.05);
+
+  --border-glass: rgba(96, 165, 250, 0.16);
+  --border-glass-hover: rgba(96, 165, 250, 0.32);
+  --border-accent: rgba(96, 165, 250, 0.5);
+
+  --text-primary: #e8ecf3;
+  --text-secondary: #9aa7c0;
+  --text-tertiary: #6b7690;
+  --text-accent: #60a5fa;
+  --text-success: #4ade80;
+
+  --accent-1: #3b82f6;
+  --accent-2: #60a5fa;
+  --accent-3: #93c5fd;
+  --danger: #f87171;
+  --success: #4ade80;
+
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(147, 197, 253, 0.12));
+  --gradient-glow: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(96, 165, 250, 0.25), rgba(147, 197, 253, 0.25));
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 30px rgba(96, 165, 250, 0.18);
+  --shadow-glow-strong: 0 4px 20px rgba(96, 165, 250, 0.35);
+}
+
+/* ═══════════════════════════════════════════════════════
    RESET
    ═══════════════════════════════════════════════════════ */
 *, *::before, *::after {

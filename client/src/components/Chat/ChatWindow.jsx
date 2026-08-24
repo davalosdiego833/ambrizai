@@ -16,8 +16,13 @@ export default function ChatWindow({ messages, isLoading, onQuickAction }) {
       {messages.length === 0 ? (
         <WelcomeScreen onQuickAction={onQuickAction} />
       ) : (
-        messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
+        messages.map((msg, idx) => (
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            isLatest={idx === messages.length - 1}
+            onSuggestionClick={onQuickAction}
+          />
         ))
       )}
       

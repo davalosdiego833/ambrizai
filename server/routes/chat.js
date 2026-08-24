@@ -391,11 +391,33 @@ router.post('/message', (req, res) => {
   };
 
   let botMessageContent = '';
-  
+  let botSources = [];
+  let botFollowUps = [];
+
   // Callback when a chunk arrives
   const onChunk = (chunk) => {
     botMessageContent += chunk;
     res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+  };
+
+  // Callback once retrieval is done, before the model starts generating —
+  // lets the UI show "esto lo saqué de: ..." as soon as it knows.
+  const onSources = (sources) => {
+    botSources = sources || [];
+    res.write(`data: ${JSON.stringify({ sources: botSources })}\n\n`);
+  };
+
+  // Callback with suggested follow-up questions, sent right before [DONE].
+  const onFollowUps = (followUps) => {
+    botFollowUps = followUps || [];
+    res.write(`data: ${JSON.stringify({ followUps: botFollowUps })}\n\n`);
+  };
+
+  // Callback the instant the visible answer text is fully streamed — lets
+  // the UI re-enable the input immediately instead of waiting on the
+  // slower (a few extra seconds) follow-up-suggestions call below.
+  const onTextDone = () => {
+    res.write(`data: ${JSON.stringify({ textDone: true })}\n\n`);
   };
 
   // Callback when streaming finishes
@@ -406,6 +428,8 @@ router.post('/message', (req, res) => {
       id: `msg_b_${Date.now()}`,
       sender: 'bot',
       text: botMessageContent,
+      sources: botSources,
+      followUps: botFollowUps,
       timestamp: new Date().toISOString(),
     };
     
@@ -436,7 +460,7 @@ router.post('/message', (req, res) => {
   // 3. Initiate stream
   // Pass the conversational history excluding the user's last message (since that is passed as userMessage)
   const conversationHistory = chat.messages.slice(0, -1);
-  streamChatResponse(conversationHistory, text, onChunk, onDone, onError);
+  streamChatResponse(conversationHistory, text, onChunk, onDone, onError, onSources, onFollowUps, onTextDone);
 });
 
 export default router;

@@ -92,7 +92,7 @@ export const api = {
   },
 
   // Streaming message request with mobile resilience
-  async sendMessageStream(chatId, text, onChunk, onError, onDone) {
+  async sendMessageStream(chatId, text, onChunk, onError, onDone, onSources, onFollowUps, onTextDone) {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/chat/message`, {
@@ -127,6 +127,9 @@ export const api = {
             try {
               const parsed = JSON.parse(dataStr);
               if (parsed.text) onChunk(parsed.text);
+              if (parsed.sources && onSources) onSources(parsed.sources);
+              if (parsed.followUps && onFollowUps) onFollowUps(parsed.followUps);
+              if (parsed.textDone && onTextDone) onTextDone();
             } catch (e) {}
           }
         }
@@ -169,6 +172,9 @@ export const api = {
                 hasReceivedChunks = true;
                 onChunk(parsed.text);
               }
+              if (parsed.sources && onSources) onSources(parsed.sources);
+              if (parsed.followUps && onFollowUps) onFollowUps(parsed.followUps);
+              if (parsed.textDone && onTextDone) onTextDone();
             } catch (e) {
               console.error('Error parsing stream chunk:', e);
             }
@@ -193,10 +199,13 @@ export const api = {
               hasReceivedChunks = true;
               onChunk(parsed.text);
             }
+            if (parsed.sources && onSources) onSources(parsed.sources);
+            if (parsed.followUps && onFollowUps) onFollowUps(parsed.followUps);
+            if (parsed.textDone && onTextDone) onTextDone();
           } catch (e) {}
         }
       }
-      
+
       onDone();
     } catch (err) {
       console.error('API sendMessageStream error:', err);

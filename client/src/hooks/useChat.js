@@ -119,6 +119,8 @@ export default function useChat(user) {
       id: botMsgId,
       sender: 'bot',
       text: '',
+      sources: [],
+      followUps: [],
       timestamp: new Date().toISOString(),
     };
 
@@ -158,7 +160,8 @@ export default function useChat(user) {
           setSending(false);
         },
         () => {
-          setSending(false);
+          // Final close: persistence/title stuff. The input was already
+          // re-enabled earlier by onTextDone, so this can take its time.
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === botMsgId && !msg.text.trim()
@@ -168,6 +171,21 @@ export default function useChat(user) {
           );
           // Refresh chat list to update titles if it was a new chat
           fetchChats(searchQuery);
+        },
+        (sources) => {
+          setMessages((prev) =>
+            prev.map((msg) => (msg.id === botMsgId ? { ...msg, sources } : msg))
+          );
+        },
+        (followUps) => {
+          setMessages((prev) =>
+            prev.map((msg) => (msg.id === botMsgId ? { ...msg, followUps } : msg))
+          );
+        },
+        () => {
+          // The visible answer text is fully in — let the advisor type the
+          // next question right away instead of waiting on follow-up chips.
+          setSending(false);
         }
       );
     } catch (err) {

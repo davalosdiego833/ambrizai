@@ -1,7 +1,31 @@
+import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getKnowledgeContext, getSemanticContext } from './knowledge.js';
 
 const CANDIDATE_MODELS = ['gemini-3.6-flash', 'gemini-3.1-pro-preview', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+
+// Both getSemanticContext and getKnowledgeContext format each source document
+// the same way ("=== DOCUMENTO: <relativePath> ==="), so we can recover a
+// deduped, friendly source list regardless of which retrieval method ran —
+// this is what lets the UI show "esto lo saqué de: ..." under each answer.
+function extractSources(knowledgeBase) {
+  if (!knowledgeBase) return [];
+  const matches = [...knowledgeBase.matchAll(/=== DOCUMENTO(?: PDF)?: ([^=]+?)(?:\s*\(relevancia semántica\))? ===/g)];
+  const seen = new Set();
+  const sources = [];
+  for (const m of matches) {
+    const relativePath = m[1].trim();
+    if (seen.has(relativePath)) continue;
+    seen.add(relativePath);
+    sources.push({
+      path: relativePath,
+      label: path.basename(relativePath, path.extname(relativePath)),
+    });
+  }
+  // Chunks arrive pre-sorted by relevance, so the first few unique documents
+  // are the most relevant ones — cap the chip list so it stays readable.
+  return sources.slice(0, 4);
+}
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (apiKey) {
@@ -17,14 +41,54 @@ if (apiKey) {
  * @param {Function} onChunk - Callback when new text chunk arrives
  * @param {Function} onDone - Callback when streaming completes
  * @param {Function} onError - Callback if an error occurs
+ * @param {Function} [onSources] - Optional callback with the list of source
+ *   documents ({ path, label }) used to ground the answer, called once the
+ *   knowledge context is ready (before the model starts generating).
  */
-export async function streamChatResponse(history, userMessage, onChunk, onDone, onError) {
+/**
+ * After a real answer, asks a fast model for 2-3 natural follow-up
+ * questions an advisor might ask next on the same topic. Best-effort only:
+ * any failure just yields no suggestions, never breaks the main chat.
+ */
+async function generateFollowUps(genAI, userMessage, botResponseText) {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
+    const prompt = `Eres un asistente que sugiere preguntas de seguimiento para un asesor de seguros de SMNYL.
+
+Dada la pregunta del asesor y la respuesta que recibió, sugiere exactamente 3 preguntas de seguimiento cortas, naturales y útiles que el asesor podría hacer a continuación sobre el mismo tema.
+
+Responde ÚNICAMENTE con las 3 preguntas, una por línea, sin numeración, sin guiones, sin texto adicional.
+
+PREGUNTA DEL ASESOR: ${userMessage}
+
+RESPUESTA QUE RECIBIÓ: ${botResponseText.slice(0, 2500)}`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      // Generous budget: this model spends some tokens "thinking" before
+      // writing output, so a tight cap here truncates the answer to nothing.
+      generationConfig: { maxOutputTokens: 2000, temperature: 0.7 },
+    });
+
+    const text = result.response.text();
+    return text
+      .split('\n')
+      .map((line) => line.replace(/^[-*\d.)\s]+/, '').trim())
+      .filter((line) => line.length > 5 && line.includes('?'))
+      .slice(0, 3);
+  } catch (err) {
+    console.warn('⚠️ No se pudieron generar preguntas de seguimiento:', err.message);
+    return [];
+  }
+}
+
+export async function streamChatResponse(history, userMessage, onChunk, onDone, onError, onSources = null, onFollowUps = null, onTextDone = null) {
   const currentKey = process.env.GEMINI_API_KEY;
-  
+
   // If no Gemini API Key, run in smart local knowledge engine mode
   if (!currentKey) {
     console.log('⚡ Usando motor de conocimientos local de Ambriz AI (sin API key)...');
-    return simulateStreamResponse(history, userMessage, onChunk, onDone, onError);
+    return simulateStreamResponse(history, userMessage, onChunk, onDone, onError, onSources, onTextDone);
   }
 
   const genAI = new GoogleGenerativeAI(currentKey);
@@ -34,6 +98,7 @@ export async function streamChatResponse(history, userMessage, onChunk, onDone, 
     // back to the old keyword-based picker only if the vector index isn't
     // built yet or the embedding call fails for some reason.
     const knowledgeBase = (await getSemanticContext(userMessage, history)) || (await getKnowledgeContext(userMessage, history));
+    if (onSources) onSources(extractSources(knowledgeBase));
     const systemPrompt = `Eres Ambriz AI, un asistente virtual de inteligencia artificial de nivel experto, altamente fluido, conversacional, servicial y brillante de la Promotoría Ambriz, especialista oficial en Seguros Monterrey New York Life (SMNYL).
 
 Tu objetivo es actuar como un consultor senior inteligente: conversar con fluidez natural, empatía, elegancia y precisión técnica impecable. Cuando el asesor te consulte sobre temas generales, te pida orientación o te pregunte cómo puedes ayudarle (por ejemplo: "¿cómo me puedes ayudar con productos de Vida?", "¿qué puedo preguntarte?", "¿cómo funciona este proceso?"), responde con soltura, claridad y elegancia, explicando detalladamente todas las formas en las que puedes asesorarle y brindándole ejemplos prácticos de preguntas que puede hacerte.
@@ -102,10 +167,12 @@ ${knowledgeBase}`;
         const result = await chat.sendMessageStream(userMessage);
 
         let receivedAnyChunk = false;
+        let fullBotText = '';
         for await (const chunk of result.stream) {
           const text = chunk.text();
           if (text) {
             receivedAnyChunk = true;
+            fullBotText += text;
             onChunk(text);
           }
         }
@@ -113,6 +180,13 @@ ${knowledgeBase}`;
         if (receivedAnyChunk) {
           success = true;
           console.log(`✅ Respuesta transmitida exitosamente usando ${modelName}.`);
+          // Let the caller unblock the UI (re-enable input) right away — the
+          // follow-up suggestions below are a slower, non-blocking extra.
+          if (onTextDone) onTextDone();
+          if (onFollowUps) {
+            const followUps = await generateFollowUps(genAI, userMessage, fullBotText);
+            onFollowUps(followUps);
+          }
           break;
         }
       } catch (modelErr) {
@@ -130,14 +204,14 @@ ${knowledgeBase}`;
   } catch (err) {
     console.error('Error en streamChatResponse (usando fallback simulado):', err);
     try {
-      return await simulateStreamResponse(history, userMessage, onChunk, onDone, onError);
+      return await simulateStreamResponse(history, userMessage, onChunk, onDone, onError, onSources, onTextDone);
     } catch (fallbackErr) {
       onError(fallbackErr || err);
     }
   }
 }
 
-async function simulateStreamResponse(history, userMessage, onChunk, onDone, onError) {
+async function simulateStreamResponse(history, userMessage, onChunk, onDone, onError, onSources = null, onTextDone = null) {
   const query = userMessage.toLowerCase().trim();
   let responseText = '';
 
@@ -146,6 +220,7 @@ async function simulateStreamResponse(history, userMessage, onChunk, onDone, onE
     // que no coincidiera con una respuesta fija de abajo hacía que este modo tronara
     // en el catch y devolviera "No pude procesar la consulta en este momento".
     const knowledgeContext = await getKnowledgeContext(userMessage, history);
+    if (onSources) onSources(extractSources(knowledgeContext));
 
     const isGreeting = /^(hola|buenos\s+dias|buenas\s+tardes|buenas\s+noches|que\s+tal|saludos|quien\s+eres|hola\s+ambriz|ayuda)/i.test(query);
 
@@ -326,6 +401,7 @@ Para darte la respuesta exacta, indícame un poco más de contexto sobre tu cons
       i++;
     } else {
       clearInterval(interval);
+      if (onTextDone) onTextDone();
       onDone();
     }
   }, 25); // 25ms per word for rapid display

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useAuth from './hooks/useAuth';
 import useChat from './hooks/useChat';
+import useTheme from './hooks/useTheme';
 import AnimatedBackground from './components/Layout/AnimatedBackground';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Layout/Header';
@@ -10,6 +11,7 @@ import Login from './components/Auth/Login';
 
 export default function App() {
   const { user, loading: authLoading, login, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const {
     chats,
@@ -83,7 +85,11 @@ export default function App() {
         />
         {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
         <div className="main-content">
-          <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <Header
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+          />
           <ChatWindow
             messages={messages}
             isLoading={sending}

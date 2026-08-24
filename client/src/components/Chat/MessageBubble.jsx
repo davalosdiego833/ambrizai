@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import botAvatar from '../../assets/ambriz_ai_avatar.png';
 
-export default function MessageBubble({ message }) {
-  const { sender, text, timestamp } = message;
+export default function MessageBubble({ message, isLatest, onSuggestionClick }) {
+  const { sender, text, timestamp, sources, followUps } = message;
   const isBot = sender === 'bot';
   const [copied, setCopied] = useState(false);
 
@@ -155,6 +155,20 @@ export default function MessageBubble({ message }) {
           )}
         </div>
         
+        {isBot && text && text.trim() && sources && sources.length > 0 && (
+          <div className="message-sources">
+            {sources.map((src, idx) => (
+              <span key={idx} className="source-chip" title={src.path}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <span>{src.label}</span>
+              </span>
+            ))}
+          </div>
+        )}
+
         {isBot && text && text.trim() && (
           <div className="message-actions">
             <button className="action-btn" onClick={handleCopy} title="Copiar respuesta">
@@ -175,6 +189,25 @@ export default function MessageBubble({ message }) {
                 </>
               )}
             </button>
+          </div>
+        )}
+
+        {isBot && isLatest && text && text.trim() && followUps && followUps.length > 0 && (
+          <div className="suggested-followups">
+            {followUps.map((question, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className="followup-chip"
+                onClick={() => onSuggestionClick && onSuggestionClick(question)}
+              >
+                {question}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            ))}
           </div>
         )}
       </div>
