@@ -1,0 +1,28 @@
+{
+  "name": "Ambriz AI — Asistente SMNYL",
+  "short_name": "Ambriz AI",
+  "description": "Asistente virtual inteligente de la Promotoría Ambriz para asesores de Seguros Monterrey New York Life.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
