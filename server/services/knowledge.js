@@ -138,6 +138,25 @@ export async function getAllCachedDocs() {
   return cachedDocs || [];
 }
 
+// Campañas/concursos: docs SMNYL están llenos de jerga de seguros muy similar
+// entre sí (comisiones, pólizas, índices), así que los puntajes de similitud
+// semántica quedan demasiado parejos entre documentos totalmente distintos —
+// el fragmento correcto a veces ni entra al top-K. Para estas preguntas,
+// además de la búsqueda semántica, mandamos el documento COMPLETO de cada
+// campaña (son ~65K caracteres en total, cabe perfecto) para garantizar que
+// nunca se pierda un dato aunque el ranking semántico falle.
+const CAMPAIGN_KEYWORDS = [
+  'campana', 'campanas', 'campaña', 'campañas', 'convencion', 'convenciones',
+  'diamante', 'diamantes', 'graduacion', 'graduación', 'mdrt', 'concurso',
+  'concursos', 'bono', 'bonos', 'cuaderno', 'legion centurion', 'legión centurión',
+  'rda', 'referido de asesor', 'cumbre', 'momentum', 'aspirante',
+];
+
+function isCampaignQuery(text) {
+  const norm = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return CAMPAIGN_KEYWORDS.some((k) => norm.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+}
+
 /**
  * Real semantic (RAG) retrieval: embeds the question and searches the whole
  * vector index by meaning instead of literal keyword overlap, across ALL
@@ -145,7 +164,7 @@ export async function getAllCachedDocs() {
  * caller can fall back to getKnowledgeContext) when the index isn't built
  * yet or something goes wrong — this must never throw and break the chat.
  */
-export async function getSemanticContext(query, history = [], topK = 12) {
+export async function getSemanticContext(query, history = [], topK = 20) {
   try {
     if (!query || !process.env.GEMINI_API_KEY) return null;
     if (getIndexSize() === 0) return null;
@@ -162,12 +181,20 @@ export async function getSemanticContext(query, history = [], topK = 12) {
     const queryVector = await embedQuery(effectiveQuery);
     const results = search(queryVector, topK);
 
-    if (!results || results.length === 0) return null;
-
     let context = '';
-    for (const r of results) {
+    for (const r of (results || [])) {
       context += `\n\n=== DOCUMENTO: ${r.relativePath} (relevancia semántica) ===\n${r.text}\n=== FIN DE FRAGMENTO ===\n`;
     }
+
+    if (isCampaignQuery(effectiveQuery)) {
+      const docs = await getAllCachedDocs();
+      const campaignDocs = docs.filter((d) => d.relativePath.toUpperCase().includes('CAMPA'));
+      for (const doc of campaignDocs) {
+        context += `\n\n=== DOCUMENTO: ${doc.relativePath} (documento completo de campaña) ===\n${doc.content}\n=== FIN DE DOCUMENTO ===\n`;
+      }
+    }
+
+    if (!context) return null;
     return context;
   } catch (err) {
     console.error('Error en búsqueda semántica (usando fallback por palabras clave):', err);

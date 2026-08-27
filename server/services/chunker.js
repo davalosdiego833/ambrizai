@@ -1,8 +1,10 @@
 // Splits a document's raw text into overlapping, paragraph-aware chunks
 // suitable for embedding + semantic search.
 
-const DEFAULT_CHUNK_SIZE = 1200; // characters
-const DEFAULT_OVERLAP = 150; // characters of overlap between consecutive chunks
+const DEFAULT_CHUNK_SIZE = 800; // characters — smaller chunks so dense, multi-part
+// documents (e.g. campaign decks with many "camino"/tier tables) don't get
+// diluted into one chunk and lose to less relevant content in the topK cutoff.
+const DEFAULT_OVERLAP = 100; // characters of overlap between consecutive chunks
 
 /**
  * Splits `text` into chunks of roughly `chunkSize` characters, preferring to

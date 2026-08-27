@@ -144,7 +144,7 @@ export function getIndexSize() {
  * Returns the top-K chunks most semantically similar to `queryVector`.
  * Each result: { score, relativePath, category, text }
  */
-export function search(queryVector, topK = 12) {
+export function search(queryVector, topK = 20) {
   const idx = loadIndex();
   if (!idx) return [];
 
