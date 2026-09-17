@@ -380,17 +380,19 @@ router.post('/message', (req, res) => {
   // throw on the now-dead socket. An unhandled 'error' on a response stream
   // crashes the whole Node process — and with real traffic, that crash-loop
   // is exactly what was piling up processes until the account's process
-  // limit got hit and took the app down for everyone. Guard every write,
-  // and set this up BEFORE the first write so nothing slips through.
+  // limit got hit and took the app down for everyone.
+  //
+  // NOTE: we deliberately do NOT pre-emptively flag "disconnected" from
+  // req.on('close') — under this host's LiteSpeed/Passenger proxying that
+  // event fired too early on real (still-connected) requests, silently
+  // swallowing every chunk for a live client. Instead we only ever react to
+  // an ACTUAL failed write, which is the one thing we know for certain
+  // means the socket is really gone.
   let clientDisconnected = false;
   let heartbeatTimer = null;
   const cleanupHeartbeat = () => {
     if (heartbeatTimer) clearInterval(heartbeatTimer);
   };
-  req.on('close', () => {
-    clientDisconnected = true;
-    cleanupHeartbeat();
-  });
   res.on('error', (err) => {
     clientDisconnected = true;
     cleanupHeartbeat();
