@@ -53,6 +53,14 @@ if (fs.existsSync(publicHtmlPath) && fs.existsSync(path.join(publicHtmlPath, 'in
   app.use(express.static(clientDistPath));
 }
 
+// Health check for uptime monitors (UptimeRobot, etc.) — deliberately public
+// and does nothing but confirm the Node process is alive and Express is
+// routing requests, so a plain "expect 200" monitor works with no special
+// configuration (no auth, no accepted-status-code tricks needed).
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
