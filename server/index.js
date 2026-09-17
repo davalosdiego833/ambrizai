@@ -13,6 +13,20 @@ import { getKnowledgeContext } from './services/knowledge.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Last-resort safety net: log and keep running instead of letting one
+// unexpected error (a bug we haven't found yet, a flaky write, whatever)
+// crash the whole process. This is exactly the class of bug that took the
+// app down repeatedly — a single broken request shouldn't cost service for
+// every advisor using it. This never replaces fixing the actual bug once
+// it shows up in the logs below; it just stops "one bad request" from
+// becoming "everyone is locked out for hours."
+process.on('uncaughtException', (err) => {
+  console.error('❌ EXCEPCIÓN NO CAPTURADA (el servidor sigue corriendo, pero esto se debe investigar):', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('❌ PROMESA RECHAZADA SIN MANEJAR (el servidor sigue corriendo, pero esto se debe investigar):', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
