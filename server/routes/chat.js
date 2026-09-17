@@ -374,21 +374,51 @@ router.post('/message', (req, res) => {
     res.flushHeaders();
   }
 
-  // Write immediate initial ping to establish connection with mobile/browser socket instantly
-  res.write(': ping\n\n');
-
-  // Heartbeat timer to keep connection alive on LiteSpeed / proxies during long AI responses
-  const heartbeatTimer = setInterval(() => {
-    if (!res.writableEnded) {
-      res.write(': heartbeat\n\n');
-    } else {
-      clearInterval(heartbeatTimer);
-    }
-  }, 2500);
-
+  // CRITICAL: if the advisor closes the tab / switches chats while the bot
+  // is still answering (responses take 10-20s, so this happens constantly
+  // with 20+ advisors using this daily), every res.write() below would
+  // throw on the now-dead socket. An unhandled 'error' on a response stream
+  // crashes the whole Node process — and with real traffic, that crash-loop
+  // is exactly what was piling up processes until the account's process
+  // limit got hit and took the app down for everyone. Guard every write,
+  // and set this up BEFORE the first write so nothing slips through.
+  let clientDisconnected = false;
+  let heartbeatTimer = null;
   const cleanupHeartbeat = () => {
     if (heartbeatTimer) clearInterval(heartbeatTimer);
   };
+  req.on('close', () => {
+    clientDisconnected = true;
+    cleanupHeartbeat();
+  });
+  res.on('error', (err) => {
+    clientDisconnected = true;
+    cleanupHeartbeat();
+    console.warn('⚠️ Error escribiendo al cliente (probablemente ya se desconectó):', err.message);
+  });
+
+  const safeWrite = (payload) => {
+    if (clientDisconnected || res.writableEnded) return;
+    try {
+      res.write(payload);
+    } catch (err) {
+      clientDisconnected = true;
+      cleanupHeartbeat();
+      console.warn('⚠️ Error escribiendo al cliente (probablemente ya se desconectó):', err.message);
+    }
+  };
+
+  // Write immediate initial ping to establish connection with mobile/browser socket instantly
+  safeWrite(': ping\n\n');
+
+  // Heartbeat timer to keep connection alive on LiteSpeed / proxies during long AI responses
+  heartbeatTimer = setInterval(() => {
+    if (clientDisconnected || res.writableEnded) {
+      cleanupHeartbeat();
+    } else {
+      safeWrite(': heartbeat\n\n');
+    }
+  }, 2500);
 
   let botMessageContent = '';
   let botSources = [];
@@ -397,33 +427,34 @@ router.post('/message', (req, res) => {
   // Callback when a chunk arrives
   const onChunk = (chunk) => {
     botMessageContent += chunk;
-    res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+    safeWrite(`data: ${JSON.stringify({ text: chunk })}\n\n`);
   };
 
   // Callback once retrieval is done, before the model starts generating —
   // lets the UI show "esto lo saqué de: ..." as soon as it knows.
   const onSources = (sources) => {
     botSources = sources || [];
-    res.write(`data: ${JSON.stringify({ sources: botSources })}\n\n`);
+    safeWrite(`data: ${JSON.stringify({ sources: botSources })}\n\n`);
   };
 
   // Callback with suggested follow-up questions, sent right before [DONE].
   const onFollowUps = (followUps) => {
     botFollowUps = followUps || [];
-    res.write(`data: ${JSON.stringify({ followUps: botFollowUps })}\n\n`);
+    safeWrite(`data: ${JSON.stringify({ followUps: botFollowUps })}\n\n`);
   };
 
   // Callback the instant the visible answer text is fully streamed — lets
   // the UI re-enable the input immediately instead of waiting on the
   // slower (a few extra seconds) follow-up-suggestions call below.
   const onTextDone = () => {
-    res.write(`data: ${JSON.stringify({ textDone: true })}\n\n`);
+    safeWrite(`data: ${JSON.stringify({ textDone: true })}\n\n`);
   };
 
   // Callback when streaming finishes
   const onDone = () => {
     cleanupHeartbeat();
-    // Save bot message to the persistent store
+    // Save bot message to the persistent store — do this even if the
+    // advisor already left, so the answer is there when they come back.
     const botMessage = {
       id: `msg_b_${Date.now()}`,
       sender: 'bot',
@@ -432,7 +463,7 @@ router.post('/message', (req, res) => {
       followUps: botFollowUps,
       timestamp: new Date().toISOString(),
     };
-    
+
     // Refresh DB instance to prevent race conditions during long-running streams
     const finalDb = readChatsDB();
     const finalChat = finalDb[userId]?.find((c) => c.id === chatId);
@@ -445,16 +476,16 @@ router.post('/message', (req, res) => {
       writeChatsDB(finalDb);
     }
 
-    res.write('data: [DONE]\n\n');
-    res.end();
+    safeWrite('data: [DONE]\n\n');
+    if (!clientDisconnected && !res.writableEnded) res.end();
   };
 
   // Callback on stream error
   const onError = (err) => {
     cleanupHeartbeat();
     console.error('Error durante streaming de chat:', err);
-    res.write(`data: ${JSON.stringify({ error: err?.message || 'Error al procesar respuesta' })}\n\n`);
-    res.end();
+    safeWrite(`data: ${JSON.stringify({ error: err?.message || 'Error al procesar respuesta' })}\n\n`);
+    if (!clientDisconnected && !res.writableEnded) res.end();
   };
 
   // 3. Initiate stream
